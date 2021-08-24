@@ -67,13 +67,13 @@ fn main() {
     let opt = Opt::from_args();
 
     // read in the DNA bytes, and we will pass it to be installed
-    if !opt.dna_path.ends_with(".dna") {
-        println!(
-            "File extension for dna_path should be .dna, but got: {:?}",
-            opt.dna_path.extension()
-        );
-        exit(1);
-    }
+    // if !opt.dna_path.ends_with(".dna") {
+    //     println!(
+    //         "File extension for dna_path should be .dna, but got: {:?}",
+    //         opt.dna_path.extension()
+    //     );
+    //     exit(1);
+    // }
     let dna_bytes = match read(opt.dna_path.clone()) {
         Ok(bytes) => bytes,
         Err(_e) => {
