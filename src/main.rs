@@ -1,12 +1,12 @@
 use embedded_holochain_runner::*;
-use std::{fs::read, path::PathBuf, process::exit, str::FromStr};
+use std::{fs::read, path::PathBuf, process::exit};
 use structopt::StructOpt;
 use tokio::signal::unix::{signal, SignalKind};
 
 #[derive(Debug, StructOpt)]
 #[structopt(
     name = "holochain-runner",
-    about = ""
+    about = "wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch "
 )]
 struct Opt {
     #[structopt(
@@ -64,20 +64,16 @@ fn main() {
 
     let opt = Opt::from_args();
 
-    // allow no dnas to be passed, but if one is passed
-    // read in its bytes, and install it
-    let mut dnas: Vec<(Vec<u8>, String)> = Vec::new();
-    if opt.dna_path.ne(&PathBuf::from_str("").unwrap()) {
-        let dna_bytes = match read(opt.dna_path.clone()) {
-            Ok(bytes) => bytes,
-            Err(_e) => {
-                println!("Failed to read dna from path: {:?}", opt.dna_path);
-                exit(1);
-            }
-        };
-        // String is like "CellNick"/"SlotId"
-        dnas = vec![(dna_bytes, "dna-slot".to_string())];
-    }
+    // read in the DNA bytes, and we will pass it to be installed
+    let dna_bytes = match read(opt.dna_path.clone()) {
+      Ok(bytes) => bytes,
+      Err(_e) => {
+        println!("Failed to read dna from path: {:?}", opt.dna_path);
+        exit(1);
+      }
+    };
+    // String is like "CellNick"/"SlotId"
+    let dnas: Vec<(Vec<u8>, String)> = vec![(dna_bytes, "dna-slot".to_string())];
 
     // An infinite stream of hangup signals.
     let mut stream = signal(SignalKind::terminate()).unwrap();
