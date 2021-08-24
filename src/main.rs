@@ -9,6 +9,11 @@ use tokio::signal::unix::{signal, SignalKind};
     about = "wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch "
 )]
 struct Opt {
+    #[structopt(help = "the path to a DNA file to be
+default installed to the app,
+ending in .dna")]
+    dna_path: PathBuf,
+
     #[structopt(
         default_value = "databases",
         help = "configuration values for `app_id` and `app_ws_port`
@@ -19,9 +24,6 @@ configuration is found at this path"
 
     #[structopt(long, default_value = "main-app")]
     app_id: String,
-
-    #[structopt(long)]
-    dna_path: PathBuf,
 
     #[structopt(long, default_value = "8888")]
     app_ws_port: u16,
@@ -65,12 +67,19 @@ fn main() {
     let opt = Opt::from_args();
 
     // read in the DNA bytes, and we will pass it to be installed
-    let dna_bytes = match read(opt.dna_path.clone()) {
-      Ok(bytes) => bytes,
-      Err(_e) => {
-        println!("Failed to read dna from path: {:?}", opt.dna_path);
+    if !opt.dna_path.ends_with(".dna") {
+        println!(
+            "File extension for dna_path should be .dna, but got: {:?}",
+            opt.dna_path.extension()
+        );
         exit(1);
-      }
+    }
+    let dna_bytes = match read(opt.dna_path.clone()) {
+        Ok(bytes) => bytes,
+        Err(_e) => {
+            println!("Failed to read dna from path: {:?}", opt.dna_path);
+            exit(1);
+        }
     };
     // String is like "CellNick"/"SlotId"
     let dnas: Vec<(Vec<u8>, String)> = vec![(dna_bytes, "dna-slot".to_string())];
