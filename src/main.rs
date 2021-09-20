@@ -1,7 +1,9 @@
 use embedded_holochain_runner::*;
 use std::{fs::read, path::PathBuf, process::exit};
 use structopt::StructOpt;
+#[cfg(not(target_os = "windows"))]
 use tokio::signal::unix::{signal, SignalKind};
+
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -85,6 +87,7 @@ fn main() {
     let dnas: Vec<(Vec<u8>, String)> = vec![(dna_bytes, "dna-slot".to_string())];
 
     // An infinite stream of hangup signals.
+    #[cfg(not(target_os = "windows"))]
     let mut stream = signal(SignalKind::terminate()).unwrap();
 
     tokio::task::block_in_place(|| {
@@ -100,11 +103,16 @@ fn main() {
                 event_channel: Some(sender),
             })
             .await;
-            // wait for SIGTERM
+
+            // wait for SIGTERM, if not windows
+            #[cfg(not(target_os = "windows"))]
             stream.recv().await;
+            #[cfg(not(target_os = "windows"))]
             println!("got sigterm");
             // send shutdown signal
+            #[cfg(not(target_os = "windows"))]
             shutdown_sender.send(true).unwrap();
+            #[cfg(not(target_os = "windows"))]
             println!("sent shutdown signal");
         })
     });
