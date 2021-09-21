@@ -39,7 +39,7 @@ jobs:
       - name: Install Sqlcipher MacOs
         if: ${{ runner.os == 'macOs' }}
         run: brew install sqlcipher
-      - name: build and uplaod lair
+      - name: build and upload lair
         run: |
           chmod a+x build-lair.sh
           ./build-lair.sh
