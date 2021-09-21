@@ -25,13 +25,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-#       - uses: taiki-e/upload-rust-binary-action@v1
-#         with:
+      - uses: taiki-e/upload-rust-binary-action@v1
+        with:
           # (required)
-#           bin: holochain-runner
-#         env:
+          bin: holochain-runner
+        env:
           # (required)
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install Sqlcipher Linux
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install libsqlcipher-dev
@@ -41,8 +41,8 @@ jobs:
           brew install sqlcipher
           brew install libsodium
       - name: build lair
-#         env:
-#           SQLCIPHER_STATIC: 1
+        #         env:
+        #           SQLCIPHER_STATIC: 1
         run: |
           cargo install lair_keystore --root . --version 0.0.3
       - name: upload binary (ubuntu only)

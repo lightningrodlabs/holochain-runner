@@ -6,7 +6,7 @@ An alternative Holochain conductor binary useful for quick startup and inclusive
 for a single DNA app.
 
 ```bash
-holochain-runner 0.0.11
+holochain-runner 0.0.23
 wrapped Holochain Conductor with Status Update events and a good SIGTERM kill switch.
 
 USAGE:
