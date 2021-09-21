@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-18.04
           - macos-latest
           - windows-latest
     runs-on: ${{ matrix.os }}
@@ -38,10 +38,26 @@ jobs:
       - name: Install Sqlcipher MacOs
         if: ${{ runner.os == 'macOs' }}
         run: brew install sqlcipher
-      - name: build and upload lair
+      - name: build lair
         env:
           SQLCIPHER_STATIC: 1
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cargo install lair_keystore --root . --version 0.0.3
-          gh release upload "${tag}" "bin/lair-keystore" --clobber
+      - name: upload binary (ubuntu only)
+        if: matrix.platform == 'ubuntu-18.04'
+        run: |
+          tagname="${GITHUB_REF#refs/tags/}"
+          cp bin/lair-keystore lair-keystore-x86_64-unknown-linux-gnu
+          gh release upload "${tagname}" "lair-keystore-x86_64-apple-darwin" --clobber
+      - name: upload binary (macos only)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          tagname="${GITHUB_REF#refs/tags/}"
+          cp bin/lair-keystore lair-keystore-x86_64-apple-darwin
+          gh release upload "${tagname}" "lair-keystore-x86_64-apple-darwin" --clobber
+      - name: upload binary (Windows only)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          tagname="${GITHUB_REF#refs/tags/}"
+          Copy-Item bin/lair-keystore.exe -Destination lair-keystore-x86_64-pc-windows-msvc.exe
+          gh release upload "${tagname}" "lair-keystore-x86_64-pc-windows-msvc.exe" --clobber
