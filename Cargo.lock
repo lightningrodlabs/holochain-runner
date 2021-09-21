@@ -1720,7 +1720,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-runner"
-version = "0.0.14"
+version = "0.0.15"
 dependencies = [
  "embedded_holochain_runner",
  "structopt",
