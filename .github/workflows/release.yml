@@ -32,6 +32,13 @@ jobs:
         env:
           # (required)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SQLCIPHER_STATIC: 1
+      - name: Install Sqlcipher Linux
+        if: ${{ runner.os == 'Linux' }}
+        run: sudo apt-get install libsqlcipher-dev
+      - name: Install Sqlcipher MacOs
+        if: ${{ runner.os == 'macOs' }}
+        run: brew install sqlcipher
       - name: build and uplaod lair
         run: |
           chmod a+x build-lair.sh
