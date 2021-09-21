@@ -37,7 +37,9 @@ jobs:
         run: sudo apt-get install libsqlcipher-dev
       - name: Install Sqlcipher MacOs
         if: ${{ runner.os == 'macOs' }}
-        run: brew install sqlcipher
+        run: |
+          brew install sqlcipher
+          brew install openssl@1.1
       - name: build lair
         env:
           SQLCIPHER_STATIC: 1
