@@ -1,6 +1,6 @@
 [package]
 name = "holochain-runner"
-version = "0.0.18"
+version = "0.0.19"
 description = "Gives a binary providing wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch"
 authors = ["Connor Turland <connor@sprillow.com>"]
 license = "CAL-1.0"
