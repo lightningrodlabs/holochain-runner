@@ -1,9 +1,6 @@
 use embedded_holochain_runner::*;
 use std::{fs::read, path::PathBuf, process::exit};
 use structopt::StructOpt;
-#[cfg(not(target_os = "windows"))]
-use tokio::signal::unix::{signal, SignalKind};
-
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -58,10 +55,31 @@ fn main() {
         .expect("can build tokio runtime");
     let _guard = rt.enter();
 
+    // set up the ctrlc shutdown listener
+    // listening for SIGINT or SIGTERM (unix), just CTRC-C on windows
+    let rt_handle = rt.handle().clone();
+    let (shutdown_sender, mut shutdown_receiver) = tokio::sync::mpsc::channel::<bool>(1);
+    ctrlc::set_handler(move || {
+        println!("ctrlc got shutdown signal");
+        // send shutdown signal
+        let shutdown_sender_c = shutdown_sender.clone();
+        tokio::task::block_in_place(|| {
+            rt.block_on(async {
+                // trigger shutdown
+                match shutdown_sender_c.send(true).await {
+                    Ok(_) => {}
+                    Err(_) => {}
+                };
+            });
+        });
+    })
+    .expect("Error setting Ctrl-C handler");
+
     // print each state signal to the terminal
-    let (sender, mut receiver) = tokio::sync::mpsc::channel::<StateSignal>(10);
+    let (state_signal_sender, mut state_signal_receiver) =
+        tokio::sync::mpsc::channel::<StateSignal>(10);
     tokio::task::spawn(async move {
-        while let Some(signal) = receiver.recv().await {
+        while let Some(signal) = state_signal_receiver.recv().await {
             println!("{}", state_signal_to_stdout(&signal));
         }
     });
@@ -87,12 +105,11 @@ fn main() {
     let dnas: Vec<(Vec<u8>, String)> = vec![(dna_bytes, "dna-slot".to_string())];
 
     // An infinite stream of hangup signals.
-    #[cfg(not(target_os = "windows"))]
-    let mut stream = signal(SignalKind::terminate()).unwrap();
 
+    // Get a handle from this runtime
     tokio::task::block_in_place(|| {
-        rt.block_on(async {
-            let shutdown_sender = async_main(HcConfig {
+        rt_handle.block_on(async {
+            let shutdown_oneshot_sender = async_main(HcConfig {
                 app_id: opt.app_id,
                 dnas,
                 admin_ws_port: opt.admin_ws_port,
@@ -100,20 +117,21 @@ fn main() {
                 datastore_path: opt.datastore_path,
                 keystore_path: opt.keystore_path,
                 proxy_url: opt.proxy_url,
-                event_channel: Some(sender),
+                event_channel: Some(state_signal_sender),
             })
             .await;
-
-            // wait for SIGTERM, if not windows
-            #[cfg(not(target_os = "windows"))]
-            stream.recv().await;
-            #[cfg(not(target_os = "windows"))]
-            println!("got sigterm");
-            // send shutdown signal
-            #[cfg(not(target_os = "windows"))]
-            shutdown_sender.send(true).unwrap();
-            #[cfg(not(target_os = "windows"))]
-            println!("sent shutdown signal");
+            // wait for shutdown signal
+            shutdown_receiver.recv().await;
+            // pass that signal through to embedded-holochain-runner
+            match shutdown_oneshot_sender.send(true) {
+                Ok(()) => {
+                    println!("successfully sent shutdown signal to embedded-holochain-runner");
+                }
+                Err(_) => {
+                    println!("the receiver of the oneshot sender must have been dropped");
+                    panic!()
+                }
+            };
         })
     });
 }
