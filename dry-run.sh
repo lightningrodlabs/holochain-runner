@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-cargo run -- --keystore-path test/data/keystore test/profiles.dna test/data/databases
+cargo run --release -- --keystore-path test/data/keystore test/profiles.dna test/data/databases
