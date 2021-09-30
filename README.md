@@ -1,12 +1,12 @@
 # holochain-runner
 
-> Holochain Revision: [0.0.103 August 18, 2021](https://github.com/holochain/holochain/releases/tag/holochain-0.0.103)
+> Holochain Revision: [0.0.108 Sep 29, 2021](https://github.com/holochain/holochain/releases/tag/holochain-0.0.108)
 
 An alternative Holochain conductor binary useful for quick startup and inclusive handling of key generation and dna installation
 for a single DNA app.
 
 ```bash
-holochain-runner 0.0.24
+holochain-runner 0.0.25
 wrapped Holochain Conductor with Status Update events and a good SIGTERM kill switch.
 
 USAGE:
