@@ -30,6 +30,7 @@ jobs:
           # (required)
           bin: holochain-runner
           tar: all
+          zip: none
         env:
           # (required)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
