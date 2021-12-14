@@ -37,7 +37,7 @@ jobs:
 
       - name: build lair
         run: |
-          cargo install lair_keystore --root . --version 0.0.7
+          cargo install lair_keystore --root . --version 0.0.9
       - name: upload binary (ubuntu only)
         if: ${{ runner.os == 'Linux' }}
         env:
