@@ -33,6 +33,9 @@ configuration is found at this path"
     #[structopt(long, default_value = "keystore")]
     keystore_path: String,
 
+    #[structopt(long)]
+    membrane_proof: Option<String>,
+
     // community
     #[structopt(
         long,
@@ -117,6 +120,7 @@ fn main() {
                 datastore_path: opt.datastore_path,
                 keystore_path: opt.keystore_path,
                 proxy_url: opt.proxy_url,
+                membrane_proof: opt.membrane_proof,
                 event_channel: Some(state_signal_sender),
             })
             .await;
