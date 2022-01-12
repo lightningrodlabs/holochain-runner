@@ -26,11 +26,7 @@ it will log this to the console when the interfaces are all ready and the app in
 
 ```toml
 [dependencies]
-embedded_holochain_runner = "0.0.103"
-
-[patch.crates-io]
-rkv = { git = "https://github.com/holochain/rkv.git", branch = "master" }
-lmdb-rkv = { git = "https://github.com/holochain/lmdb-rs.git" }
+embedded_holochain_runner = "0.0.7"
 ```
 
 Assuming you have a compiled Holochain DNA file sitting around at `../dna/sample/sample.dna`...
@@ -98,7 +94,7 @@ Zome `Cargo.toml`
 [dependencies]
 # use whatever hdk uses
 serde = "*"
-hdk = "0.0.109"
+hdk = "0.0.115"
 ```
 
-Currently bundles Holochain version: [0.0.109 (October 6, 2021)](https://github.com/holochain/holochain/releases/tag/holochain-0.0.109).
+Currently bundles Holochain version: [0.0.115 Nov 10, 2021](https://github.com/holochain/holochain/releases/tag/holochain-0.0.115).

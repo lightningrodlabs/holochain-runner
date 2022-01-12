@@ -1,3 +1,4 @@
+use hdk::prelude::AgentPubKey;
 use holochain::conductor::{
     api::error::{ConductorApiError, ConductorApiResult, SerializationError},
     error::ConductorError,
@@ -15,23 +16,13 @@ use crate::emit::{emit, StateSignal};
 
 pub async fn install_app(
     conductor_handle: &ConductorHandle,
+    agent_key: AgentPubKey,
     app_id: InstalledAppId,
     dnas: Vec<(Vec<u8>, String)>,
     membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
 ) -> ConductorApiResult<()> {
-    emit(event_channel, StateSignal::CreatingKeys).await;
-    println!("Don't recognize you, so generating a new identity for you...");
-    let agent_key = conductor_handle
-        .keystore()
-        .clone()
-        .new_sign_keypair_random()
-        .await?;
-    emit(event_channel, StateSignal::RegisteringDna).await;
-    println!(
-        "Your new key pair is generated, the public key is: {:?}",
-        agent_key
-    );
+    
     println!("continuing with the installation...");
     // register any dnas
     let tasks = dnas.into_iter().map(|(dna_bytes, nick)| {

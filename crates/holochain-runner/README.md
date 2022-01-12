@@ -1,12 +1,12 @@
 # holochain-runner
 
-> Holochain Revision: [0.0.109 Oct 6, 2021](https://github.com/holochain/holochain/releases/tag/holochain-0.0.109)
+> Holochain Revision: [0.0.115 Nov 10, 2021](https://github.com/holochain/holochain/releases/tag/holochain-0.0.115)
 
 An alternative Holochain conductor binary useful for quick startup and inclusive handling of key generation and dna installation
 for a single DNA app.
 
 ```bash
-holochain-runner 0.0.28
+holochain-runner 0.0.30
 wrapped Holochain Conductor with Status Update events and a good SIGTERM kill switch.
 
 USAGE:
@@ -21,6 +21,7 @@ OPTIONS:
         --app-id <app-id>                   [default: main-app]
         --app-ws-port <app-ws-port>         [default: 8888]
         --keystore-path <keystore-path>     [default: keystore]
+        --membrane-proof <membrane-proof>   (optional) -> base64 encoded string
         --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
                                            qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
 

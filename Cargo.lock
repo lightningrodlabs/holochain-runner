@@ -1089,36 +1089,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "embedded_holochain_runner"
-version = "0.0.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7b17dc957a690b86c3dadda19bf2895f2d52a2590c0007869ae98aec5b5bc29"
-dependencies = [
- "base64",
- "ctrlc",
- "futures",
- "hdk",
- "holochain",
- "holochain_keystore",
- "holochain_p2p",
- "holochain_types",
- "holochain_util",
- "holochain_zome_types",
- "human-panic",
- "serde",
- "tokio",
- "tracing",
- "wasmer-compiler",
- "wasmer-compiler-cranelift",
- "wasmer-derive",
- "wasmer-engine",
- "wasmer-engine-dylib",
- "wasmer-engine-universal",
- "wasmer-types",
- "wasmer-vm",
-]
-
-[[package]]
 name = "encoding_rs"
 version = "0.8.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1752,7 +1722,7 @@ name = "holochain-runner"
 version = "0.0.30"
 dependencies = [
  "ctrlc",
- "embedded_holochain_runner 0.0.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "embedded_holochain_runner",
  "structopt",
  "tokio",
 ]

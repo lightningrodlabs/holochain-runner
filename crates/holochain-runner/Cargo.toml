@@ -10,7 +10,7 @@ edition = "2018"
 [dependencies]
 structopt = "0.3.11"
 tokio = { version = "1.3", features = [ "full" ]}
-# embedded_holochain_runner = { path = "../embedded_holochain_runner" }
-embedded_holochain_runner = "0.0.7"
+embedded_holochain_runner = { path = "../embedded-holochain-runner" }
+# embedded_holochain_runner = "0.0.7"
 # termination feature enables handling of SIGTERM events as well on unix
 ctrlc = { version = "3.2.0", features = ["termination"] }

@@ -10,7 +10,10 @@ use std::path::Path;
 use tokio::sync::{mpsc, oneshot};
 use tracing::*;
 
-use crate::emit::{emit, StateSignal};
+use crate::{
+    emit::{emit, StateSignal},
+    generate_key::find_or_generate_key,
+};
 
 pub struct HcConfig {
     pub app_id: String,
@@ -160,9 +163,19 @@ async fn install_or_passthrough(
     let mut using_app_id = app_id.clone();
     let mut using_app_ws_port = app_ws_port.clone();
 
+    let agent_key = find_or_generate_key(&conductor, event_channel).await?;
+
     if app_ids.len() == 0 {
-        println!("Don't see existing files or identity, so starting fresh...");
-        super::install_enable::install_app(&conductor, app_id.clone(), dnas, membrane_proof, event_channel).await?;
+        println!("There is no app installed, so starting fresh...");
+        super::install_enable::install_app(
+            &conductor,
+            agent_key,
+            app_id.clone(),
+            dnas,
+            membrane_proof,
+            event_channel,
+        )
+        .await?;
         println!("Installed, now enabling...");
         super::install_enable::enable_app(&conductor, app_id, event_channel).await?;
         // add a websocket interface on the first run
