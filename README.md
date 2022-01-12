@@ -33,3 +33,53 @@ ARGS:
                         will be overridden if an existing
                         configuration is found at this path [default: databases]
 ```
+
+## How it will work
+
+`datastore-path` is most important. If existing persisted Holochain conductor files
+are found in the given directory, it will simply re-use the `admin_ws_port` `app_ws_port` `app_id` and `dnas` from that configuration. Otherwise, it will create that directory, and setup your configuration as specified.
+
+`keystore-path` can point to an empty folder, or a pre-existing keystore, as long as its compatible. Currently using lair v0.0.9.
+
+It uses structopt to make a configurable service. For a more advanced application using shutdown signal, and `StateSignal` listeners, you can see it in use in the [Acorn Holochain application](https://github.com/h-be/acorn/blob/main/conductor/src/main.rs).
+
+In either case,
+
+- first run/installation
+- second run/reboot
+
+it will log this to the console when the interfaces are all ready and the app installed or running:
+
+`EMBEDDED_HOLOCHAIN_IS_READY`
+
+It will clearly log its configuration to the console.
+
+RUST_LOG environment variable can be set to get details logs from Holochain. Those logs are by default suppressed.
+
+## Events
+
+It may emit events, based on event types in an enum `StateSignal`. These will be logged to the console
+so that you can track the internal state and progress.
+
+It looks like:
+
+```rust
+pub enum StateSignal {
+    // will be only one or the other of these
+    IsFirstRun,
+    IsNotFirstRun,
+    // are sub events after IsFirstRun
+    CreatingKeys,
+    RegisteringDna,
+    InstallingApp,
+    EnablingApp,
+    AddingAppInterface,
+    // Done/Ready Event, called when websocket interfaces and
+    // everything else is ready
+    IsReady,
+}
+```
+
+## Bootstrap Networking Service
+
+This library is currently pointed at the `https://bootstrap-staging.holo.host` node discovery service.
