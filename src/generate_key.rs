@@ -1,7 +1,15 @@
 use hdk::prelude::AgentPubKey;
-use holochain::conductor::{api::error::{ConductorApiResult, ConductorApiError}, ConductorHandle};
+use holochain::conductor::{
+    api::error::{ConductorApiError, ConductorApiResult},
+    ConductorHandle,
+};
 use holochain_keystore::KeystoreError;
-use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::lair_keystore_api_0_0::actor::{LairClientApiSender, LairEntryType};
+use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::{
+    ghost_actor::GhostSender,
+    lair_keystore_api_0_0::actor::{
+        KeystoreIndex, LairClientApi, LairClientApiSender, LairEntryType,
+    },
+};
 
 use crate::{emit::emit, StateSignal};
 use tokio::sync::mpsc;
@@ -21,34 +29,23 @@ pub async fn find_or_generate_key(
             })?;
             // if last index is 0 there are none
             match index_of_entry.0 {
-                0 => {
-                    None
-                }
+                0 => None,
+                // if last index is greater than 0
+                // then lair keystore has some entries
+                // loop and check each, picking the first Ed25519 pair
                 _ => {
-                    let entry_type =
-                        api.lair_get_entry_type(index_of_entry)
-                            .await
-                            .map_err(|_e| {
-                                ConductorApiError::KeystoreError(KeystoreError::Other(
-                                    "failed to call lair_get_entry_type".to_string(),
-                                ))
-                            })?;
-                    match entry_type {
-                        LairEntryType::SignEd25519 => {
-                            let public_key =
-                                api.sign_ed25519_get(index_of_entry).await.map_err(|_e| {
-                                    ConductorApiError::KeystoreError(KeystoreError::Other(
-                                        "failed to call sign_ed25519_get".to_string(),
-                                    ))
-                                })?;
-                            Some(AgentPubKey::from_raw_32(public_key.to_vec()))
-                        }
-                        _ => {
-                            return Err(ConductorApiError::KeystoreError(KeystoreError::Other(
-                                "keystore entry was not SignEd25519".to_string(),
-                            )))
+                    let mut option_key_to_return = None;
+                    for n in 1..index_of_entry.0 {
+                        let keystore_index = KeystoreIndex::from(n);
+                        match check_key(keystore_index, api.clone()).await? {
+                            Some(key) => {
+                                option_key_to_return = Some(key);
+                            }
+                            // do nothing
+                            None => {}
                         }
                     }
+                    option_key_to_return
                 }
             }
         }
@@ -76,5 +73,30 @@ pub async fn find_or_generate_key(
             );
             Ok(agent_key)
         }
+    }
+}
+
+pub async fn check_key(
+    index_of_entry: KeystoreIndex,
+    api: GhostSender<LairClientApi>,
+) -> ConductorApiResult<Option<AgentPubKey>> {
+    let entry_type = api
+        .lair_get_entry_type(index_of_entry)
+        .await
+        .map_err(|_e| {
+            ConductorApiError::KeystoreError(KeystoreError::Other(
+                "failed to call lair_get_entry_type".to_string(),
+            ))
+        })?;
+    match entry_type {
+        LairEntryType::SignEd25519 => {
+            let public_key = api.sign_ed25519_get(index_of_entry).await.map_err(|_e| {
+                ConductorApiError::KeystoreError(KeystoreError::Other(
+                    "failed to call sign_ed25519_get".to_string(),
+                ))
+            })?;
+            Ok(Some(AgentPubKey::from_raw_32(public_key.to_vec())))
+        }
+        _ => return Ok(None),
     }
 }
