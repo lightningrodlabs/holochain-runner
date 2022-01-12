@@ -1,6 +1,13 @@
-use embedded_holochain_runner::*;
 use std::{fs::read, path::PathBuf, process::exit};
+use embedded_runner::{async_main, HcConfig};
+use emit::StateSignal;
 use structopt::StructOpt;
+
+mod embedded_runner;
+mod config;
+mod install_enable;
+mod emit;
+mod generate_key;
 
 #[derive(Debug, StructOpt)]
 #[structopt(

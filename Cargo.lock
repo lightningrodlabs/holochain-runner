@@ -1061,34 +1061,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
-name = "embedded_holochain_runner"
-version = "0.0.7"
-dependencies = [
- "base64",
- "ctrlc",
- "futures",
- "hdk",
- "holochain",
- "holochain_keystore",
- "holochain_p2p",
- "holochain_types",
- "holochain_util",
- "holochain_zome_types",
- "human-panic",
- "serde",
- "tokio",
- "tracing",
- "wasmer-compiler",
- "wasmer-compiler-cranelift",
- "wasmer-derive",
- "wasmer-engine",
- "wasmer-engine-dylib",
- "wasmer-engine-universal",
- "wasmer-types",
- "wasmer-vm",
-]
-
-[[package]]
 name = "encoding_rs"
 version = "0.8.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1719,12 +1691,31 @@ dependencies = [
 
 [[package]]
 name = "holochain-runner"
-version = "0.0.30"
+version = "0.0.31"
 dependencies = [
+ "base64",
  "ctrlc",
- "embedded_holochain_runner",
+ "futures",
+ "hdk",
+ "holochain",
+ "holochain_keystore",
+ "holochain_p2p",
+ "holochain_types",
+ "holochain_util",
+ "holochain_zome_types",
+ "human-panic",
+ "serde",
  "structopt",
  "tokio",
+ "tracing",
+ "wasmer-compiler",
+ "wasmer-compiler-cranelift",
+ "wasmer-derive",
+ "wasmer-engine",
+ "wasmer-engine-dylib",
+ "wasmer-engine-universal",
+ "wasmer-types",
+ "wasmer-vm",
 ]
 
 [[package]]
@@ -3288,9 +3279,9 @@ dependencies = [
 
 [[package]]
 name = "openssl-probe"
-version = "0.1.4"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28988d872ab76095a6e6ac88d99b54fd267702734fd7ffe610ca27f533ddb95a"
+checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
 name = "openssl-sys"
