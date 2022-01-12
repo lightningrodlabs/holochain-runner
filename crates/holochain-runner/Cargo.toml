@@ -1,0 +1,16 @@
+[package]
+name = "holochain-runner"
+version = "0.0.30"
+description = "Gives a binary providing wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch"
+authors = ["Connor Turland <connor@sprillow.com>"]
+license = "CAL-1.0"
+repository = "https://github.com/Sprillow/holochain-runner"
+edition = "2018"
+
+[dependencies]
+structopt = "0.3.11"
+tokio = { version = "1.3", features = [ "full" ]}
+# embedded_holochain_runner = { path = "../embedded_holochain_runner" }
+embedded_holochain_runner = "0.0.7"
+# termination feature enables handling of SIGTERM events as well on unix
+ctrlc = { version = "3.2.0", features = ["termination"] }
