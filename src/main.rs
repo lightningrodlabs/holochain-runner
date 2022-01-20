@@ -2,6 +2,7 @@ use std::{fs::read, path::PathBuf, process::exit};
 use embedded_runner::{async_main, HcConfig};
 use emit::StateSignal;
 use structopt::StructOpt;
+use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 
 mod embedded_runner;
 mod config;
@@ -49,6 +50,12 @@ configuration is found at this path"
         default_value = "kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--"
     )]
     proxy_url: String,
+
+    #[structopt(long, parse(from_str = Url2::parse))]
+    bootstrap_url: Option<Url2>,
+
+    #[structopt(long)]
+    uid: Option<String>,
 }
 
 fn main() {
@@ -58,7 +65,7 @@ fn main() {
         // we use both IO and Time tokio utilities
         .enable_all()
         // give our threads a descriptive name (they'll be numbered too)
-        .thread_name("acorn-tokio-thread")
+        .thread_name("hc-runner-tokio-thread")
         // build the runtime
         .build()
         // panic if we cannot (we cannot run without it)
@@ -129,6 +136,8 @@ fn main() {
                 proxy_url: opt.proxy_url,
                 membrane_proof: opt.membrane_proof,
                 event_channel: Some(state_signal_sender),
+                bootstrap_url: opt.bootstrap_url,
+                uid: opt.uid,
             })
             .await;
             // wait for shutdown signal

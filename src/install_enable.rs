@@ -1,4 +1,4 @@
-use hdk::prelude::AgentPubKey;
+use hdk::prelude::{AgentPubKey, Uid};
 use holochain::conductor::{
     api::error::{ConductorApiError, ConductorApiResult, SerializationError},
     error::ConductorError,
@@ -21,6 +21,7 @@ pub async fn install_app(
     dnas: Vec<(Vec<u8>, String)>,
     membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
+    uid: Option<Uid>,
 ) -> ConductorApiResult<()> {
     
     println!("continuing with the installation...");
@@ -29,14 +30,16 @@ pub async fn install_app(
         let agent_key = agent_key.clone();
         let conductor_handle_clone = conductor_handle.clone();
         let proof_cloned = membrane_proof.clone();
+        let uid_cloned = uid.clone();
         tokio::task::spawn(async move {
             println!("decoding dna bundle");
             let dna = DnaBundle::decode(&dna_bytes)?;
             println!("converting to dna file");
-            let (dna_file, dna_hash) = dna.into_dna_file(None, None).await?;
+            let (dna_file, _original_dna_hash) = dna.into_dna_file(uid_cloned, None).await?;
             println!("calling register dna");
-            conductor_handle_clone.register_dna(dna_file).await?;
-            let cell_id = CellId::from((dna_hash.clone(), agent_key));
+            conductor_handle_clone.register_dna(dna_file.clone()).await?;
+            let cell_id = CellId::from((dna_file.dna_hash().clone(), agent_key));
+
             // if there's a membrane proof
             // decode it from base64 using default options
             // and construct SerializedBytes from it

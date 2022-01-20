@@ -24,6 +24,8 @@ OPTIONS:
         --membrane-proof <membrane-proof>   (optional) -> base64 encoded string
         --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
                                            qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
+        --bootstrap-url <bootstrap-url>     (optional)  [default: https://bootstrap-staging.holo.host]
+        --uid <uid>                         (optional)
 
 ARGS:
     <dna-path>          the path to a DNA file to be

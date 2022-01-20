@@ -4,12 +4,13 @@ use holochain::conductor::{
 use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::observability::{
     self, Output,
 };
+use holochain_zome_types::Uid;
 use holochain_types::app::InstalledAppId;
 use holochain_util::tokio_helper;
 use std::path::Path;
 use tokio::sync::{mpsc, oneshot};
 use tracing::*;
-
+use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use crate::{
     emit::{emit, StateSignal},
     generate_key::find_or_generate_key,
@@ -25,6 +26,8 @@ pub struct HcConfig {
     pub membrane_proof: Option<String>,
     pub proxy_url: String,
     pub event_channel: Option<mpsc::Sender<StateSignal>>,
+    pub bootstrap_url: Option<Url2>,
+    pub uid: Option<Uid>,
 }
 
 pub fn blocking_main(hc_config: HcConfig) {
@@ -82,10 +85,12 @@ pub async fn async_main(hc_config: HcConfig) -> oneshot::Sender<bool> {
         &hc_config.datastore_path,
         &hc_config.keystore_path,
         &hc_config.proxy_url,
+        &hc_config.bootstrap_url,
     )
     .await;
     println!("DATASTORE_PATH: {}", hc_config.datastore_path);
-    println!("KEYSTORE_PATH: {}", hc_config.keystore_path);
+    println!(" KEYSTORE_PATH: {}", hc_config.keystore_path);
+    println!("           UID: {:?}", hc_config.uid);
 
     // install the app with its dnas, if they aren't already
     // as well as adding the app_ws_port
@@ -98,6 +103,7 @@ pub async fn async_main(hc_config: HcConfig) -> oneshot::Sender<bool> {
             hc_config.dnas,
             hc_config.membrane_proof,
             &hc_config.event_channel,
+            hc_config.uid,
         )
         .await
         {
@@ -138,9 +144,10 @@ async fn conductor_handle(
     databases_path: &str,
     keystore_path: &str,
     proxy_url: &str,
+    maybe_boostrap_url: &Option<Url2>,
 ) -> ConductorHandle {
     let config =
-        super::config::conductor_config(admin_ws_port, databases_path, keystore_path, proxy_url);
+        super::config::conductor_config(admin_ws_port, databases_path, keystore_path, proxy_url, maybe_boostrap_url.to_owned());
     // Initialize the Conductor
     Conductor::builder()
         .config(config)
@@ -157,6 +164,7 @@ async fn install_or_passthrough(
     dnas: Vec<(Vec<u8>, String)>,
     membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
+    uid: Option<Uid>,
 ) -> ConductorApiResult<()> {
     let app_ids = conductor.list_running_apps().await?;
     // defaults
@@ -174,6 +182,7 @@ async fn install_or_passthrough(
             dnas,
             membrane_proof,
             event_channel,
+            uid,
         )
         .await?;
         println!("Installed, now enabling...");
@@ -197,7 +206,7 @@ async fn install_or_passthrough(
     }
 
     emit(&event_channel, StateSignal::IsReady).await;
-    println!("APP_WS_PORT: {}", using_app_ws_port);
+    println!("     APP_WS_PORT: {}", using_app_ws_port);
     println!("INSTALLED_APP_ID: {}", using_app_id);
     println!("EMBEDDED_HOLOCHAIN_IS_READY");
     Ok(())
