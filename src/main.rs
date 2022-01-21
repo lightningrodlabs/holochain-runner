@@ -65,7 +65,7 @@ fn main() {
         // we use both IO and Time tokio utilities
         .enable_all()
         // give our threads a descriptive name (they'll be numbered too)
-        .thread_name("hc-runner-tokio-thread")
+        .thread_name("holochain-runner-tokio-thread")
         // build the runtime
         .build()
         // panic if we cannot (we cannot run without it)
