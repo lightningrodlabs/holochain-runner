@@ -3,6 +3,8 @@
 > Holochain Revision: [v0.0.115 Nov 10, 2021](https://github.com/holochain/holochain/releases/tag/holochain-0.0.115)
 > 
 > Lair Keystore Revision: [v0.0.9 Nov 4, 2021](https://github.com/holochain/lair/releases/tag/v0.0.9)
+>
+> Expects a DNA built with HDK [v0.0.115](https://docs.rs/hdk/0.0.115/hdk/index.html)
 
 An alternative Holochain conductor binary useful for quick startup and inclusive handling of key generation and dna installation
 for a single DNA app.
