@@ -1,12 +1,13 @@
 # holochain-runner
 
-> Holochain Revision: [0.0.115 Nov 10, 2021](https://github.com/holochain/holochain/releases/tag/holochain-0.0.115)
+> Holochain Revision: [v0.0.115 Nov 10, 2021](https://github.com/holochain/holochain/releases/tag/holochain-0.0.115)
+> Lair Keystore Revision: [v0.0.9 Nov 4, 2021](https://github.com/holochain/lair/releases/tag/v0.0.9)
 
 An alternative Holochain conductor binary useful for quick startup and inclusive handling of key generation and dna installation
 for a single DNA app.
 
 ```bash
-holochain-runner 0.0.30
+holochain-runner 0.0.33
 wrapped Holochain Conductor with Status Update events and a good SIGTERM kill switch.
 
 USAGE:
@@ -41,7 +42,7 @@ ARGS:
 `datastore-path` is most important. If existing persisted Holochain conductor files
 are found in the given directory, it will simply re-use the `admin_ws_port` `app_ws_port` `app_id` and `dnas` from that configuration. Otherwise, it will create that directory, and setup your configuration as specified.
 
-`keystore-path` can point to an empty folder, or a pre-existing keystore, as long as its compatible. Currently using lair v0.0.9.
+`keystore-path` can point to an empty folder, or a pre-existing keystore, as long as that keystore uses a compatible keystore format. If there is a private key in the existing keystore it will use that to install the DNA and app, if there is none, it will generate one automatically on the first run.
 
 It uses structopt to make a configurable service. For a more advanced application using shutdown signal, and `StateSignal` listeners, you can see it in use in the [Acorn Holochain application](https://github.com/h-be/acorn/blob/main/conductor/src/main.rs).
 
@@ -84,4 +85,4 @@ pub enum StateSignal {
 
 ## Bootstrap Networking Service
 
-This library is currently pointed at the `https://bootstrap-staging.holo.host` node discovery service.
+This library is currently by default pointed at the `https://bootstrap-staging.holo.host` node discovery service, but can be overridden.
