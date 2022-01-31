@@ -23,7 +23,7 @@ FLAGS:
 OPTIONS:
         --admin-ws-port <admin-ws-port>     [default: 1234]
         --app-id <app-id>                   [default: main-app]
-        --app-ws-port <app-ws-port>         [default: 8888]
+        --app-ws-port <app-ws-port>         [default: 0]
         --keystore-path <keystore-path>     [default: keystore]
         --membrane-proof <membrane-proof>   (optional) -> base64 encoded string
         --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-

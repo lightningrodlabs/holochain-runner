@@ -32,8 +32,8 @@ configuration is found at this path"
     #[structopt(long, default_value = "main-app")]
     app_id: String,
 
-    #[structopt(long, default_value = "8888")]
-    app_ws_port: u16,
+    #[structopt(long)]
+    app_ws_port: Option<u16>,
 
     #[structopt(long, default_value = "1234")]
     admin_ws_port: u16,

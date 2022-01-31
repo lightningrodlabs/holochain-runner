@@ -1,26 +1,26 @@
+use crate::{
+    emit::{emit, StateSignal},
+    generate_key::find_or_generate_key,
+};
 use holochain::conductor::{
     api::error::ConductorApiResult, manager::handle_shutdown, Conductor, ConductorHandle,
 };
 use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::observability::{
     self, Output,
 };
-use holochain_zome_types::Uid;
+use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use holochain_types::app::InstalledAppId;
-use holochain_util::tokio_helper;
+// use holochain_util::tokio_helper;
+use holochain_zome_types::Uid;
 use std::path::Path;
 use tokio::sync::{mpsc, oneshot};
 use tracing::*;
-use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
-use crate::{
-    emit::{emit, StateSignal},
-    generate_key::find_or_generate_key,
-};
 
 pub struct HcConfig {
     pub app_id: String,
     pub dnas: Vec<(Vec<u8>, String)>,
     pub admin_ws_port: u16,
-    pub app_ws_port: u16,
+    pub app_ws_port: Option<u16>,
     pub datastore_path: String,
     pub keystore_path: String,
     pub membrane_proof: Option<String>,
@@ -30,36 +30,36 @@ pub struct HcConfig {
     pub uid: Option<Uid>,
 }
 
-pub fn blocking_main(hc_config: HcConfig) {
-    tokio_helper::block_forever_on(async {
-        let sender = async_main(hc_config).await;
-        let (passthrough_sender, mut passthrough_receiver) = tokio::sync::mpsc::channel::<bool>(1);
-        tokio::task::spawn(async move {
-            passthrough_receiver.recv().await;
-            match sender.send(true) {
-                Ok(()) => {
-                    println!("succesfully sent shutdown signal to holochain");
-                }
-                Err(_) => {
-                    println!("the receiver of the oneshot sender must have been dropped");
-                    panic!()
-                }
-            };
-        });
-        // wait for SIGINT or SIGTERM
-        ctrlc::set_handler(move || {
-            // send shutdown signal
-            let sender = passthrough_sender.clone();
-            tokio::spawn(async move {
-                if let Err(_) = sender.send(true).await {
-                    println!("receiver of the passthrough_sender dropped");
-                    panic!()
-                }
-            });
-        })
-        .expect("Error setting Ctrl-C handler");
-    })
-}
+// pub fn blocking_main(hc_config: HcConfig) {
+//     tokio_helper::block_forever_on(async {
+//         let sender = async_main(hc_config).await;
+//         let (passthrough_sender, mut passthrough_receiver) = tokio::sync::mpsc::channel::<bool>(1);
+//         tokio::task::spawn(async move {
+//             passthrough_receiver.recv().await;
+//             match sender.send(true) {
+//                 Ok(()) => {
+//                     println!("succesfully sent shutdown signal to holochain");
+//                 }
+//                 Err(_) => {
+//                     println!("the receiver of the oneshot sender must have been dropped");
+//                     panic!()
+//                 }
+//             };
+//         });
+//         // wait for SIGINT or SIGTERM
+//         ctrlc::set_handler(move || {
+//             // send shutdown signal
+//             let sender = passthrough_sender.clone();
+//             tokio::spawn(async move {
+//                 if let Err(_) = sender.send(true).await {
+//                     println!("receiver of the passthrough_sender dropped");
+//                     panic!()
+//                 }
+//             });
+//         })
+//         .expect("Error setting Ctrl-C handler");
+//     })
+// }
 
 pub async fn async_main(hc_config: HcConfig) -> oneshot::Sender<bool> {
     // Sets up a human-readable panic message with a request for bug reports
@@ -99,7 +99,9 @@ pub async fn async_main(hc_config: HcConfig) -> oneshot::Sender<bool> {
         match install_or_passthrough(
             &conductor_copy,
             hc_config.app_id,
-            hc_config.app_ws_port,
+            // the 0 default here will just let the
+            // system pick a port
+            hc_config.app_ws_port.unwrap_or(0),
             hc_config.dnas,
             hc_config.membrane_proof,
             &hc_config.event_channel,
@@ -146,8 +148,13 @@ async fn conductor_handle(
     proxy_url: &str,
     maybe_boostrap_url: &Option<Url2>,
 ) -> ConductorHandle {
-    let config =
-        super::config::conductor_config(admin_ws_port, databases_path, keystore_path, proxy_url, maybe_boostrap_url.to_owned());
+    let config = super::config::conductor_config(
+        admin_ws_port,
+        databases_path,
+        keystore_path,
+        proxy_url,
+        maybe_boostrap_url.to_owned(),
+    );
     // Initialize the Conductor
     Conductor::builder()
         .config(config)
@@ -169,7 +176,7 @@ async fn install_or_passthrough(
     let app_ids = conductor.list_running_apps().await?;
     // defaults
     let mut using_app_id = app_id.clone();
-    let mut using_app_ws_port = app_ws_port.clone();
+    let using_app_ws_port: u16;
 
     let agent_key = find_or_generate_key(&conductor, event_channel).await?;
 
@@ -190,7 +197,7 @@ async fn install_or_passthrough(
         // add a websocket interface on the first run
         // it will boot again at the same interface on second run
         emit(&event_channel, StateSignal::AddingAppInterface).await;
-        conductor.clone().add_app_interface(app_ws_port).await?;
+        using_app_ws_port = conductor.clone().add_app_interface(app_ws_port).await?;
         println!("Enabled.");
     } else {
         println!("An existing configuration and identity was found, using that.");
@@ -201,7 +208,7 @@ async fn install_or_passthrough(
             using_app_ws_port = app_ports[0];
         } else {
             println!("No app port is attached, adding one.");
-            conductor.clone().add_app_interface(app_ws_port).await?;
+            using_app_ws_port = conductor.clone().add_app_interface(app_ws_port).await?;
         }
     }
 
