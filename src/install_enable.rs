@@ -1,9 +1,12 @@
+use std::{collections::HashMap, path::PathBuf};
+
 use hdk::prelude::{AgentPubKey, Uid};
 use holochain::conductor::{
     api::error::{ConductorApiError, ConductorApiResult, SerializationError},
     error::ConductorError,
     CellError, ConductorHandle,
 };
+use holochain_types::prelude::{InstallAppBundlePayload, AppBundleSource};
 #[allow(deprecated)]
 use holochain_types::{
     app::InstalledAppId,
@@ -18,7 +21,8 @@ pub async fn install_app(
     conductor_handle: &ConductorHandle,
     agent_key: AgentPubKey,
     app_id: InstalledAppId,
-    dnas: Vec<(Vec<u8>, String)>,
+    // dnas: Vec<(Vec<u8>, String)>,
+    happ_path: PathBuf,
     membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     uid: Option<Uid>,
@@ -26,55 +30,23 @@ pub async fn install_app(
     
     println!("continuing with the installation...");
     // register any dnas
-    let tasks = dnas.into_iter().map(|(dna_bytes, nick)| {
-        let agent_key = agent_key.clone();
-        let conductor_handle_clone = conductor_handle.clone();
-        let proof_cloned = membrane_proof.clone();
-        let uid_cloned = uid.clone();
-        tokio::task::spawn(async move {
-            println!("decoding dna bundle");
-            let dna = DnaBundle::decode(&dna_bytes)?;
-            println!("converting to dna file");
-            let (dna_file, _original_dna_hash) = dna.into_dna_file(uid_cloned, None).await?;
-            println!("calling register dna");
-            conductor_handle_clone.register_dna(dna_file.clone()).await?;
-            let cell_id = CellId::from((dna_file.dna_hash().clone(), agent_key));
-
-            // if there's a membrane proof
-            // decode it from base64 using default options
-            // and construct SerializedBytes from it
-            let membrane_proof = match proof_cloned {
-                Some(string_proof) => match base64::decode(string_proof) {
-                    Ok(res) => {
-                        let unsafe_bytes = UnsafeBytes::from(res);
-                        Some(SerializedBytes::from(unsafe_bytes))
-                    }
-                    Err(_e) => {
-                        return Err(ConductorApiError::SerializationError(
-                            SerializationError::Bytes(SerializedBytesError::Deserialize(
-                                "couldnt decode base64".to_string(),
-                            )),
-                        ))
-                    }
-                },
-                None => None,
-            };
-            #[allow(deprecated)]
-            ConductorApiResult::Ok((InstalledCell::new(cell_id, nick), membrane_proof))
-        })
-    });
-    // Join all the install tasks
-    let cell_ids_with_proofs = futures::future::join_all(tasks)
-        .await
-        .into_iter()
-        .map(|result| result.unwrap())
-        // Check all passed and return the proofs
-        .collect::<Result<Vec<_>, _>>()?;
+    // let agent_key = agent_key;
+    // let conductor_handle_clone = conductor_handle;
+    // let proof_cloned = membrane_proof;
+    // let uid_cloned = uid.clone();
     emit(event_channel, StateSignal::InstallingApp).await;
     // Install the CellIds as an "app", with an installed_app_id
+    let payload: InstallAppBundlePayload = InstallAppBundlePayload {
+        source: AppBundleSource::Path(happ_path),
+        agent_key,
+        installed_app_id: Some(app_id),
+        membrane_proofs: HashMap::new(),
+        uid,
+    };
     conductor_handle
         .clone()
-        .install_app(app_id, cell_ids_with_proofs.clone())
+        // .install_app(app_id, cell_ids_with_proofs.clone())
+        .install_app_bundle(payload)
         .await?;
     Ok(())
 }

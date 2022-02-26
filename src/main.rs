@@ -16,10 +16,10 @@ mod generate_key;
     about = "wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch "
 )]
 struct Opt {
-    #[structopt(help = "the path to a DNA file to be
+    #[structopt(help = "the path to a HAPP file to be
 default installed to the app,
-ending in .dna")]
-    dna_path: PathBuf,
+ending in .happ")]
+    happ_path: PathBuf,
 
     #[structopt(
         default_value = "databases",
@@ -111,15 +111,7 @@ fn main() {
     //     );
     //     exit(1);
     // }
-    let dna_bytes = match read(opt.dna_path.clone()) {
-        Ok(bytes) => bytes,
-        Err(_e) => {
-            println!("Failed to read dna from path: {:?}", opt.dna_path);
-            exit(1);
-        }
-    };
-    // String is like "CellNick"/"SlotId"
-    let dnas: Vec<(Vec<u8>, String)> = vec![(dna_bytes, "dna-slot".to_string())];
+    
 
     // An infinite stream of hangup signals.
 
@@ -128,7 +120,7 @@ fn main() {
         rt_handle.block_on(async {
             let shutdown_oneshot_sender = async_main(HcConfig {
                 app_id: opt.app_id,
-                dnas,
+                happ_path: opt.happ_path,
                 admin_ws_port: opt.admin_ws_port,
                 app_ws_port: opt.app_ws_port,
                 datastore_path: opt.datastore_path,

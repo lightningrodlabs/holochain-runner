@@ -12,13 +12,13 @@ use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use holochain_types::app::InstalledAppId;
 // use holochain_util::tokio_helper;
 use holochain_zome_types::Uid;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use tokio::sync::{mpsc, oneshot};
 use tracing::*;
 
 pub struct HcConfig {
     pub app_id: String,
-    pub dnas: Vec<(Vec<u8>, String)>,
+    pub happ_path: PathBuf,
     pub admin_ws_port: u16,
     pub app_ws_port: Option<u16>,
     pub datastore_path: String,
@@ -102,7 +102,7 @@ pub async fn async_main(hc_config: HcConfig) -> oneshot::Sender<bool> {
             // the 0 default here will just let the
             // system pick a port
             hc_config.app_ws_port.unwrap_or(0),
-            hc_config.dnas,
+            hc_config.happ_path,
             hc_config.membrane_proof,
             &hc_config.event_channel,
             hc_config.uid,
@@ -168,7 +168,7 @@ async fn install_or_passthrough(
     conductor: &ConductorHandle,
     app_id: InstalledAppId,
     app_ws_port: u16,
-    dnas: Vec<(Vec<u8>, String)>,
+    happ_path: PathBuf,
     membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     uid: Option<Uid>,
@@ -186,7 +186,7 @@ async fn install_or_passthrough(
             &conductor,
             agent_key,
             app_id.clone(),
-            dnas,
+            happ_path,
             membrane_proof,
             event_channel,
             uid,

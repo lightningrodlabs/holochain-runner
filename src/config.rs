@@ -5,7 +5,7 @@ use holochain_p2p::kitsune_p2p::{
     dependencies::url2::{self, Url2},
     KitsuneP2pConfig, ProxyConfig, TransportConfig,
 };
-use holochain_types::prelude::DbSyncLevel;
+use holochain_types::env::DbSyncStrategy;
 use std::path::PathBuf;
 
 pub fn conductor_config(
@@ -34,7 +34,7 @@ pub fn conductor_config(
     ConductorConfig {
         environment_path: PathBuf::from(databases_path).into(),
         dpki: None,
-        db_sync_level: DbSyncLevel::default(),
+        db_sync_strategy: DbSyncStrategy::default(),
         keystore: KeystoreConfig::LairServerLegacyDeprecated {
             keystore_path: Some(PathBuf::from(keystore_path)),
             danger_passphrase_insecure_from_config: (String::from("passphrase-placeholder")),
