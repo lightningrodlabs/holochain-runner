@@ -21,7 +21,6 @@ pub async fn install_app(
     conductor_handle: &ConductorHandle,
     agent_key: AgentPubKey,
     app_id: InstalledAppId,
-    // dnas: Vec<(Vec<u8>, String)>,
     happ_path: PathBuf,
     membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
@@ -30,10 +29,6 @@ pub async fn install_app(
     
     println!("continuing with the installation...");
     // register any dnas
-    // let agent_key = agent_key;
-    // let conductor_handle_clone = conductor_handle;
-    // let proof_cloned = membrane_proof;
-    // let uid_cloned = uid.clone();
     emit(event_channel, StateSignal::InstallingApp).await;
     // Install the CellIds as an "app", with an installed_app_id
     let payload: InstallAppBundlePayload = InstallAppBundlePayload {
