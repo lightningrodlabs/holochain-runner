@@ -22,7 +22,7 @@ pub async fn install_app(
     agent_key: AgentPubKey,
     app_id: InstalledAppId,
     happ_path: PathBuf,
-    membrane_proof: Option<String>,
+    // membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     uid: Option<Uid>,
 ) -> ConductorApiResult<()> {

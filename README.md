@@ -7,7 +7,7 @@
 > Expects an HAPP built with HDK [v0.0.122](https://docs.rs/hdk/0.0.122/hdk/index.html)
 
 An alternative Holochain conductor binary useful for quick startup and inclusive handling of key generation and dna installation
-for a single DNA app.
+for a multi-DNA hApp.
 
 ```bash
 holochain-runner 0.0.35
@@ -21,15 +21,14 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-        --admin-ws-port <admin-ws-port>       [default: 1234]
-        --app-id <app-id>                     [default: main-app]
-        --app-ws-port <app-ws-port>          
-        --bootstrap-url <bootstrap-url>      
-        --keystore-path <keystore-path>       [default: keystore]
-        --membrane-proof <membrane-proof>    
-        --proxy-url <proxy-url>               [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
-                                             qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
-        --uid <uid>                          
+        --admin-ws-port <admin-ws-port>     [default: 1234]
+        --app-id <app-id>                   [default: main-app]
+        --app-ws-port <app-ws-port>        
+        --bootstrap-url <bootstrap-url>    
+        --keystore-path <keystore-path>     [default: keystore]
+        --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
+                                           qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
+        --uid <uid>                        
 
 ARGS:
     <happ-path>         the path to a HAPP file to be
@@ -39,13 +38,12 @@ ARGS:
                         will be overridden if an existing
                         configuration is found at this path [default: databases]
 ```
-
 ## How it will work
 
 `datastore-path` is most important. If existing persisted Holochain conductor files
 are found in the given directory, it will simply re-use the `admin_ws_port` `app_ws_port` `app_id` and `dnas` from that configuration. Otherwise, it will create that directory, and setup your configuration as specified.
 
-`keystore-path` can point to an empty folder, or a pre-existing keystore, as long as that keystore uses a compatible keystore format. If there is a private key in the existing keystore it will use that to install the DNA and app, if there is none, it will generate one automatically on the first run.
+`keystore-path` can point to an empty folder, or a pre-existing keystore, as long as that keystore uses a compatible keystore format. If there is a private key in the existing keystore it will use that to install the HAPP, if there is none, it will generate one automatically on the first run.
 
 It uses structopt to make a configurable service. For a more advanced application using shutdown signal, and `StateSignal` listeners, you can see it in use in the [Acorn Holochain application](https://github.com/h-be/acorn/blob/main/conductor/src/main.rs).
 

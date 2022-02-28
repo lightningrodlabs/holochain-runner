@@ -23,7 +23,7 @@ pub struct HcConfig {
     pub app_ws_port: Option<u16>,
     pub datastore_path: String,
     pub keystore_path: String,
-    pub membrane_proof: Option<String>,
+    // pub membrane_proof: Option<String>,
     pub proxy_url: String,
     pub event_channel: Option<mpsc::Sender<StateSignal>>,
     pub bootstrap_url: Option<Url2>,
@@ -103,7 +103,7 @@ pub async fn async_main(hc_config: HcConfig) -> oneshot::Sender<bool> {
             // system pick a port
             hc_config.app_ws_port.unwrap_or(0),
             hc_config.happ_path,
-            hc_config.membrane_proof,
+            // hc_config.membrane_proof,
             &hc_config.event_channel,
             hc_config.uid,
         )
@@ -169,7 +169,7 @@ async fn install_or_passthrough(
     app_id: InstalledAppId,
     app_ws_port: u16,
     happ_path: PathBuf,
-    membrane_proof: Option<String>,
+    // membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     uid: Option<Uid>,
 ) -> ConductorApiResult<()> {
@@ -187,7 +187,7 @@ async fn install_or_passthrough(
             agent_key,
             app_id.clone(),
             happ_path,
-            membrane_proof,
+            // membrane_proof,
             event_channel,
             uid,
         )
