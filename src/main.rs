@@ -103,16 +103,6 @@ fn main() {
 
     let opt = Opt::from_args();
 
-    // read in the DNA bytes, and we will pass it to be installed
-    // if !opt.dna_path.ends_with(".dna") {
-    //     println!(
-    //         "File extension for dna_path should be .dna, but got: {:?}",
-    //         opt.dna_path.extension()
-    //     );
-    //     exit(1);
-    // }
-    
-
     // An infinite stream of hangup signals.
 
     // Get a handle from this runtime
