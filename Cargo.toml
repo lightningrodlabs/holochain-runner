@@ -1,6 +1,6 @@
 [package]
 name = "holochain-runner"
-version = "0.0.35"
+version = "0.0.36"
 description = "Gives a binary providing wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch"
 authors = ["Connor Turland <connor@sprillow.com>"]
 license = "CAL-1.0"
@@ -8,19 +8,19 @@ repository = "https://github.com/Sprillow/holochain-runner"
 edition = "2018"
 
 [dependencies]
-structopt = "0.3.11"
-base64 = "0.13.0"
-serde = "1.0.123"
-futures = "0.3.1"
+structopt = "0.3"
+base64 = "0.13"
+serde = "1.0"
+futures = "0.3"
 human-panic = "1.0.3"
 tracing = "0.1.26"
-tokio = { version = "1.3", features = ["full"] }
+tokio = { version = "1.11", features = ["full"] }
 holochain_util = "0.0.7"
-holochain_p2p = "0.0.26"
-holochain_types = "0.0.26"
-holochain_zome_types = "0.0.24"
-holochain_keystore = "0.0.26"
-holochain = "0.0.126"
-hdk = "0.0.122"
+holochain_p2p = "0.0.27"
+holochain_types = "0.0.27"
+holochain_zome_types = "0.0.25"
+holochain_keystore = "0.0.27"
+holochain = "0.0.127"
+hdk = "0.0.123"
 # termination feature enables handling of SIGTERM events as well on unix
 ctrlc = { version = "3.2.0", features = ["termination"] }
