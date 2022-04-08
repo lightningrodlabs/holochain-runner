@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 use hdk::prelude::{AgentPubKey, Uid};
 use holochain::conductor::{
-    api::error::{ConductorApiError, ConductorApiResult, SerializationError},
+    api::error::{ConductorApiError, ConductorApiResult},
     error::ConductorError,
     CellError, ConductorHandle,
 };
@@ -10,9 +10,7 @@ use holochain_types::prelude::{InstallAppBundlePayload, AppBundleSource};
 #[allow(deprecated)]
 use holochain_types::{
     app::InstalledAppId,
-    prelude::{DnaBundle, InstalledCell},
 };
-use holochain_zome_types::{CellId, SerializedBytes, SerializedBytesError, UnsafeBytes};
 use tokio::sync::mpsc;
 
 use crate::emit::{emit, StateSignal};

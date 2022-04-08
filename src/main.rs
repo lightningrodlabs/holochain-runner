@@ -1,4 +1,4 @@
-use std::{fs::read, path::PathBuf, process::exit};
+use std::path::PathBuf;
 use embedded_runner::{async_main, HcConfig};
 use emit::StateSignal;
 use structopt::StructOpt;
