@@ -5,7 +5,7 @@ use holochain_p2p::kitsune_p2p::{
     dependencies::url2::{self, Url2},
     KitsuneP2pConfig, ProxyConfig, TransportConfig,
 };
-use holochain_types::env::DbSyncStrategy;
+use holochain_types::db::DbSyncStrategy;
 use std::path::PathBuf;
 
 pub fn conductor_config(
