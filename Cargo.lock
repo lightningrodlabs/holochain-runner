@@ -1718,7 +1718,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-runner"
-version = "0.0.37"
+version = "0.0.38"
 dependencies = [
  "base64",
  "ctrlc",
