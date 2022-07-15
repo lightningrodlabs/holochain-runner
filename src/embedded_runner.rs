@@ -22,7 +22,7 @@ pub struct HcConfig {
     pub admin_ws_port: u16,
     pub app_ws_port: Option<u16>,
     pub datastore_path: String,
-    pub keystore_path: String,
+    pub keystore_url: Url2,
     // pub membrane_proof: Option<String>,
     pub proxy_url: String,
     pub event_channel: Option<mpsc::Sender<StateSignal>>,
@@ -61,7 +61,7 @@ pub struct HcConfig {
 //     })
 // }
 
-pub async fn async_main(hc_config: HcConfig) -> oneshot::Sender<bool> {
+pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> oneshot::Sender<bool> {
     // Sets up a human-readable panic message with a request for bug reports
     // See https://docs.rs/human-panic/1.0.3/human_panic/
     human_panic::setup_panic!();
@@ -81,15 +81,16 @@ pub async fn async_main(hc_config: HcConfig) -> oneshot::Sender<bool> {
     }
     // run up a conductor
     let conductor = conductor_handle(
+        passphrase,
         hc_config.admin_ws_port,
         &hc_config.datastore_path,
-        &hc_config.keystore_path,
+        &hc_config.keystore_url,
         &hc_config.proxy_url,
         &hc_config.bootstrap_url,
     )
     .await;
     println!("DATASTORE_PATH: {}", hc_config.datastore_path);
-    println!(" KEYSTORE_PATH: {}", hc_config.keystore_path);
+    println!(" KEYSTORE_URL: {}", hc_config.keystore_url);
     println!("           UID: {:?}", hc_config.uid);
 
     // install the app with its dnas, if they aren't already
@@ -142,22 +143,24 @@ pub async fn async_main(hc_config: HcConfig) -> oneshot::Sender<bool> {
 }
 
 async fn conductor_handle(
+    passphrase: sodoken::BufRead,
     admin_ws_port: u16,
     databases_path: &str,
-    keystore_path: &str,
+    keystore_url: &Url2,
     proxy_url: &str,
     maybe_boostrap_url: &Option<Url2>,
 ) -> ConductorHandle {
     let config = super::config::conductor_config(
         admin_ws_port,
         databases_path,
-        keystore_path,
+        keystore_url,
         proxy_url,
         maybe_boostrap_url.to_owned(),
     );
     // Initialize the Conductor
     Conductor::builder()
         .config(config)
+        .passphrase(Some(passphrase))
         .build()
         .await
         .expect("Could not initialize Conductor from configuration")

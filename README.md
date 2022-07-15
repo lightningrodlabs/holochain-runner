@@ -13,7 +13,7 @@ An alternative Holochain conductor binary useful for quick startup and including
 holochain-runner 0.0.39
 wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
 
-USAGE:
+USAGE:n
     holochain-runner [OPTIONS] <happ-path> [datastore-path]
 
 FLAGS:
