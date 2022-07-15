@@ -6,6 +6,7 @@ use holochain::conductor::{
 use holochain_keystore::KeystoreError;
 use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::{
     ghost_actor::GhostSender,
+    lair_keystore_api::lair_store::*,
     lair_keystore_api_0_0::actor::{
         KeystoreIndex, LairClientApi, LairClientApiSender, LairEntryType,
     },
@@ -50,7 +51,43 @@ pub async fn find_or_generate_key(
             }
         }
         // we aren't using this version
-        holochain_keystore::MetaLairClient::NewLair(_) => unreachable!(),
+        holochain_keystore::MetaLairClient::NewLair(api) => {
+            let lair_entries = api.list_entries().await.map_err(|_e| {
+                ConductorApiError::KeystoreError(KeystoreError::Other(
+                    "failed to call lair_get_last_entry_index".to_string(),
+                ))
+            })?;
+            match lair_entries.len() {
+                0 => None,
+                _ => {
+                    // there are lair entries
+                    let mut option_key_to_return = None;
+                    // we will loop through, and whatever one
+                    // is the last one will end up being the one
+                    // we choose. Very unselective at the moment, but
+                    // that's fine
+                    for entry in lair_entries {
+                        match entry {
+                            LairEntryInfo::Seed { tag: _, seed_info } => {
+                                option_key_to_return = Some(AgentPubKey::from_raw_32(
+                                    seed_info.ed25519_pub_key.to_vec(),
+                                ));
+                            }
+                            LairEntryInfo::DeepLockedSeed {
+                                tag: _,
+                                seed_info: _,
+                            } => {}
+                            LairEntryInfo::WkaTlsCert {
+                                tag: _,
+                                cert_info: _,
+                            } => {}
+                            _ => {}
+                        }
+                    }
+                    option_key_to_return
+                }
+            }
+        }
     };
 
     match preset_agent_key {

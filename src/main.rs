@@ -1,14 +1,15 @@
-use std::path::PathBuf;
 use embedded_runner::{async_main, HcConfig};
 use emit::StateSignal;
-use structopt::StructOpt;
 use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
+use std::path::PathBuf;
+use structopt::StructOpt;
 
-mod embedded_runner;
 mod config;
-mod install_enable;
+mod embedded_runner;
 mod emit;
 mod generate_key;
+mod install_enable;
+mod read_passphrase_secure;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -38,8 +39,8 @@ configuration is found at this path"
     #[structopt(long, default_value = "1234")]
     admin_ws_port: u16,
 
-    #[structopt(long, default_value = "keystore")]
-    keystore_path: String,
+    #[structopt(long, parse(from_str = Url2::parse))]
+    keystore_url: Url2,
 
     // #[structopt(long)]
     // membrane_proof: Option<String>,
@@ -108,19 +109,28 @@ fn main() {
     // Get a handle from this runtime
     tokio::task::block_in_place(|| {
         rt_handle.block_on(async {
-            let shutdown_oneshot_sender = async_main(HcConfig {
-                app_id: opt.app_id,
-                happ_path: opt.happ_path,
-                admin_ws_port: opt.admin_ws_port,
-                app_ws_port: opt.app_ws_port,
-                datastore_path: opt.datastore_path,
-                keystore_path: opt.keystore_path,
-                proxy_url: opt.proxy_url,
-                // membrane_proof: opt.membrane_proof,
-                event_channel: Some(state_signal_sender),
-                bootstrap_url: opt.bootstrap_url,
-                uid: opt.uid,
-            })
+            println!("Looking for passphrase piped to stdin");
+            let passphrase = read_passphrase_secure::read_piped_passphrase()
+            .await
+            .unwrap();
+            println!("Found passphrase, continuing...");
+
+            let shutdown_oneshot_sender = async_main(
+                passphrase,
+                HcConfig {
+                    app_id: opt.app_id,
+                    happ_path: opt.happ_path,
+                    admin_ws_port: opt.admin_ws_port,
+                    app_ws_port: opt.app_ws_port,
+                    datastore_path: opt.datastore_path,
+                    keystore_url: opt.keystore_url,
+                    proxy_url: opt.proxy_url,
+                    // membrane_proof: opt.membrane_proof,
+                    event_channel: Some(state_signal_sender),
+                    bootstrap_url: opt.bootstrap_url,
+                    uid: opt.uid,
+                },
+            )
             .await;
             // wait for shutdown signal
             shutdown_receiver.recv().await;

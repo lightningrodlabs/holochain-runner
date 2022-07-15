@@ -11,7 +11,7 @@ use std::path::PathBuf;
 pub fn conductor_config(
     admin_port: u16,
     databases_path: &str,
-    keystore_path: &str,
+    keystore_url: &Url2,
     proxy_url: &str,
     maybe_boostrap_url: Option<Url2>,
 ) -> ConductorConfig {
@@ -35,9 +35,8 @@ pub fn conductor_config(
         environment_path: PathBuf::from(databases_path).into(),
         dpki: None,
         db_sync_strategy: DbSyncStrategy::default(),
-        keystore: KeystoreConfig::LairServerLegacyDeprecated {
-            keystore_path: Some(PathBuf::from(keystore_path)),
-            danger_passphrase_insecure_from_config: (String::from("passphrase-placeholder")),
+        keystore: KeystoreConfig::LairServer {
+            connection_url: keystore_url.to_owned(),
         },
         admin_interfaces: Some(vec![AdminInterfaceConfig {
             driver: InterfaceDriver::Websocket { port: admin_port },
