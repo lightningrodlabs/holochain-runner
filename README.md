@@ -24,7 +24,7 @@ OPTIONS:
         --app-id <app-id>                   [default: main-app]
         --app-ws-port <app-ws-port>        
         --bootstrap-url <bootstrap-url>    
-        --keystore-path <keystore-path>     [default: keystore]
+        --keystore-url <keystore-url>       (required)
         --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
                                            qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
         --uid <uid>                        
