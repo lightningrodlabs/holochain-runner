@@ -1,15 +1,15 @@
 # holochain-runner
 
-> Holochain Revision: [v0.0.149  July 10, 2022](https://github.com/holochain/holochain/releases/tag/holochain-0.0.149)
+> Holochain Revision: [v0.0.150  July 10, 2022](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20220713013021)
 > 
 > Lair Keystore Revision: [v0.2.0 June 20, 2022](https://github.com/holochain/lair/releases/tag/lair_keystore-v0.2.0)
 >
-> Expects an HAPP built with HDK [v0.0.141](https://docs.rs/hdk/0.0.141/hdk/index.html) and HDI [v0.0.13](https://docs.rs/holochain_deterministic_integrity/0.0.13/holochain_deterministic_integrity/index.html)
+> Expects an HAPP built with HDK [v0.0.142](https://docs.rs/hdk/0.0.142/hdk/index.html) and HDI [v0.0.14](https://docs.rs/hdi/0.0.14/hdi/index.html)
 
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.0.39
+holochain-runner 0.0.40
 wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
 
 USAGE:
