@@ -11,7 +11,7 @@ use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::o
 use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use holochain_types::app::InstalledAppId;
 // use holochain_util::tokio_helper;
-use holochain_zome_types::Uid;
+use holochain_zome_types::NetworkSeed;
 use std::path::{Path, PathBuf};
 use tokio::sync::{mpsc, oneshot};
 use tracing::*;
@@ -27,7 +27,7 @@ pub struct HcConfig {
     pub proxy_url: String,
     pub event_channel: Option<mpsc::Sender<StateSignal>>,
     pub bootstrap_url: Option<Url2>,
-    pub uid: Option<Uid>,
+    pub network_seed: Option<NetworkSeed>,
 }
 
 // pub fn blocking_main(hc_config: HcConfig) {
@@ -90,8 +90,8 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> on
     )
     .await;
     println!("DATASTORE_PATH: {}", hc_config.datastore_path);
-    println!(" KEYSTORE_URL: {}", hc_config.keystore_url);
-    println!("           UID: {:?}", hc_config.uid);
+    println!("KEYSTORE_URL: {}", hc_config.keystore_url);
+    println!("NETWORK_SEED: {:?}", hc_config.network_seed);
 
     // install the app with its dnas, if they aren't already
     // as well as adding the app_ws_port
@@ -106,7 +106,7 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> on
             hc_config.happ_path,
             // hc_config.membrane_proof,
             &hc_config.event_channel,
-            hc_config.uid,
+            hc_config.network_seed,
         )
         .await
         {
@@ -174,7 +174,7 @@ async fn install_or_passthrough(
     happ_path: PathBuf,
     // membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
-    uid: Option<Uid>,
+    network_seed: Option<NetworkSeed>,
 ) -> ConductorApiResult<()> {
     let app_ids = conductor.list_running_apps().await?;
     // defaults
@@ -192,7 +192,7 @@ async fn install_or_passthrough(
             happ_path,
             // membrane_proof,
             event_channel,
-            uid,
+            network_seed,
         )
         .await?;
         println!("Installed, now enabling...");

@@ -56,7 +56,7 @@ configuration is found at this path"
     bootstrap_url: Option<Url2>,
 
     #[structopt(long)]
-    uid: Option<String>,
+    network_seed: Option<String>,
 }
 
 fn main() {
@@ -128,7 +128,7 @@ fn main() {
                     // membrane_proof: opt.membrane_proof,
                     event_channel: Some(state_signal_sender),
                     bootstrap_url: opt.bootstrap_url,
-                    uid: opt.uid,
+                    network_seed: opt.network_seed,
                 },
             )
             .await;

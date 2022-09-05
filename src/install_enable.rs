@@ -1,6 +1,6 @@
 use std::{collections::HashMap, path::PathBuf};
 
-use hdk::prelude::{AgentPubKey, Uid};
+use hdk::prelude::{AgentPubKey, NetworkSeed};
 use holochain::conductor::{
     api::error::{ConductorApiError, ConductorApiResult},
     error::ConductorError,
@@ -22,7 +22,7 @@ pub async fn install_app(
     happ_path: PathBuf,
     // membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
-    uid: Option<Uid>,
+    network_seed: Option<NetworkSeed>,
 ) -> ConductorApiResult<()> {
     
     println!("continuing with the installation...");
@@ -34,7 +34,7 @@ pub async fn install_app(
         agent_key,
         installed_app_id: Some(app_id),
         membrane_proofs: HashMap::new(),
-        uid,
+        network_seed,
     };
     conductor_handle
         .clone()

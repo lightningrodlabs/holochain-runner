@@ -1,15 +1,15 @@
 # holochain-runner
 
-> Holochain Revision: [v0.0.150  July 13, 2022](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20220713013021)
+> Holochain Revision: [v0.0.156  August 23, 2022](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20220823103320)
 > 
 > Lair Keystore Revision: [v0.2.0 June 20, 2022](https://github.com/holochain/lair/releases/tag/lair_keystore-v0.2.0)
 >
-> Expects an HAPP built with HDK [v0.0.142](https://docs.rs/hdk/0.0.142/hdk/index.html) and HDI [v0.0.14](https://docs.rs/hdi/0.0.14/hdi/index.html)
+> Expects an HAPP built with HDK [v0.0.147](https://docs.rs/hdk/0.0.147/hdk/index.html) and HDI [v0.0.19](https://docs.rs/hdi/0.0.19/hdi/index.html)
 
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.0.40
+holochain-runner 0.1.0
 wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
 
 USAGE:
@@ -27,7 +27,7 @@ OPTIONS:
         --keystore-url <keystore-url>       (required)
         --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
                                            qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
-        --uid <uid>                        
+        --network-seed <network-seed>
 
 ARGS:
     <happ-path>         the path to a HAPP file to be
