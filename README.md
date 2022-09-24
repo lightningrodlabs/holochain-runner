@@ -1,15 +1,13 @@
 # holochain-runner
 
-> Holochain Revision: [v0.0.156  August 23, 2022](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20220823103320)
-> 
-> Lair Keystore Revision: [v0.2.0 June 20, 2022](https://github.com/holochain/lair/releases/tag/lair_keystore-v0.2.0)
+> Holochain Revision: [v0.0.162  September 14, 2022](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20220914013149)
 >
-> Expects an HAPP built with HDK [v0.0.147](https://docs.rs/hdk/0.0.147/hdk/index.html) and HDI [v0.0.19](https://docs.rs/hdi/0.0.19/hdi/index.html)
+> Expects an HAPP built with HDK [v0.0.152](https://docs.rs/hdk/0.0.152/hdk/index.html) and HDI [v0.1.2](https://docs.rs/hdi/0.1.2/hdi/index.html)
 
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.1.0
+holochain-runner 0.2.0
 wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
 
 USAGE:
@@ -24,7 +22,7 @@ OPTIONS:
         --app-id <app-id>                   [default: main-app]
         --app-ws-port <app-ws-port>        
         --bootstrap-url <bootstrap-url>    
-        --keystore-url <keystore-url>       (required)
+        --keystore-path <keystore-path>     
         --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
                                            qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
         --network-seed <network-seed>
@@ -40,16 +38,12 @@ ARGS:
 ## How it will work
 
 Lair Keystore setup requires use of a passphrase for encryption and security.
-A folder containing lair-keystore config can be checked to see if this file exists, lair-keystore-config.yaml, in
-order to tell whether lair-keystore has been initialized or not.
-Lair v0.2.0 requires a setup step, `lair-keystore init -p`, which will take a piped passphrase.
-Lair v0.2.0 requires the passphrase when executing the server: `lair-keystore server -p`, which will take a piped passphrase.
-You should also pipe the passphrase to `holochain-runner` as STDIN, so that it can unlock the lair-keystore and connect to it. You do not need to pass `-p`, it assumes the password will be piped.
+You should pipe the passphrase to `holochain-runner` as STDIN, so that it can unlock the lair-keystore and connect to it. You do not need to pass `-p`, it assumes the password will be piped.
 
 `datastore-path` is most important. If existing persisted Holochain conductor files
 are found in the given directory, it will simply re-use the `admin_ws_port` `app_ws_port` `app_id` and `dnas` from that configuration. Otherwise, it will create that directory, and setup your configuration as specified.
 
-`keystore-url` can point to an empty folder, or a pre-existing keystore, as long as that keystore uses a compatible keystore format. If there is a private key in the existing keystore it will use that to install the HAPP, if there is none, it will generate one automatically on the first run.
+`keystore-path` can point to an empty folder, or a pre-existing keystore, as long as that keystore uses a compatible keystore format. If there is a private key in the existing keystore it will use that to install the HAPP, if there is none, it will generate one automatically on the first run.
 
 It uses structopt to make a configurable service. For a more advanced application using shutdown signal, and `StateSignal` listeners, you can see it in use in the [Acorn Holochain application](https://github.com/h-be/acorn/blob/main/conductor/src/main.rs).
 
@@ -60,7 +54,7 @@ In either case,
 
 it will log this to the console when the interfaces are all ready and the app installed or running:
 
-`EMBEDDED_HOLOCHAIN_IS_READY`
+`HOLOCHAIN_RUNNER_IS_READY`
 
 It will clearly log its configuration to the console.
 

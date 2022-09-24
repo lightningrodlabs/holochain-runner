@@ -22,7 +22,7 @@ pub struct HcConfig {
     pub admin_ws_port: u16,
     pub app_ws_port: Option<u16>,
     pub datastore_path: String,
-    pub keystore_url: Url2,
+    pub keystore_path: Option<PathBuf>,
     // pub membrane_proof: Option<String>,
     pub proxy_url: String,
     pub event_channel: Option<mpsc::Sender<StateSignal>>,
@@ -84,13 +84,13 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> on
         passphrase,
         hc_config.admin_ws_port,
         &hc_config.datastore_path,
-        &hc_config.keystore_url,
+        &hc_config.keystore_path,
         &hc_config.proxy_url,
         &hc_config.bootstrap_url,
     )
     .await;
     println!("DATASTORE_PATH: {}", hc_config.datastore_path);
-    println!("KEYSTORE_URL: {}", hc_config.keystore_url);
+    println!("KEYSTORE_PATH: {:?}", hc_config.keystore_path);
     println!("NETWORK_SEED: {:?}", hc_config.network_seed);
 
     // install the app with its dnas, if they aren't already
@@ -146,16 +146,16 @@ async fn conductor_handle(
     passphrase: sodoken::BufRead,
     admin_ws_port: u16,
     databases_path: &str,
-    keystore_url: &Url2,
+    keystore_path: &Option<PathBuf>,
     proxy_url: &str,
     maybe_boostrap_url: &Option<Url2>,
 ) -> ConductorHandle {
     let config = super::config::conductor_config(
         admin_ws_port,
         databases_path,
-        keystore_url,
+        keystore_path,
         proxy_url,
-        maybe_boostrap_url.to_owned(),
+        maybe_boostrap_url,
     );
     // Initialize the Conductor
     Conductor::builder()
@@ -218,6 +218,6 @@ async fn install_or_passthrough(
     emit(&event_channel, StateSignal::IsReady).await;
     println!("     APP_WS_PORT: {}", using_app_ws_port);
     println!("INSTALLED_APP_ID: {}", using_app_id);
-    println!("EMBEDDED_HOLOCHAIN_IS_READY");
+    println!("HOLOCHAIN_RUNNER_IS_READY");
     Ok(())
 }
