@@ -26,3 +26,6 @@ holochain = { version = "0.0.162" }
 hdk = "0.0.152"
 # termination feature enables handling of SIGTERM events as well on unix
 ctrlc = { version = "3.2.0", features = ["termination"] }
+
+[features]
+db-encryption = [ "holochain/db-encryption"]
