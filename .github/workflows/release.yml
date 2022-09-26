@@ -22,6 +22,12 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - windows-latest
+        include:
+          - os: ubuntu-latest
+            features: db-encryption
+          - os: macos-latest
+            features: db-encryption
+          # no database encryption available for windows at this time
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -31,6 +37,8 @@ jobs:
           bin: holochain-runner
           tar: all
           zip: none
+          # (optional) Build with the given set of features if any.
+          features: ${{ matrix.features || '' }}
         env:
           # (required)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
