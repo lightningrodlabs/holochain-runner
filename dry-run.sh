@@ -15,6 +15,6 @@ set -euo pipefail
 # echo mypassword | ./dry-run.sh
 
 cargo run --release -- \
-  --keystore-url add-connection-url-here \
+  --keystore-path test/data/keystore \
   test/test.happ test/data/databases
 #cargo run --release -- --keystore-path test/data/keystore test/hrea_suite.happ test/data/databases

@@ -39,8 +39,8 @@ configuration is found at this path"
     #[structopt(long, default_value = "1234")]
     admin_ws_port: u16,
 
-    #[structopt(long, parse(from_str = Url2::parse))]
-    keystore_url: Url2,
+    #[structopt(long)]
+    keystore_path: Option<PathBuf>,
 
     // #[structopt(long)]
     // membrane_proof: Option<String>,
@@ -111,8 +111,7 @@ fn main() {
         rt_handle.block_on(async {
             println!("Looking for passphrase piped to stdin");
             let passphrase = read_passphrase_secure::read_piped_passphrase()
-            .await
-            .unwrap();
+                .expect("could not read piped passphrase");
             println!("Found passphrase, continuing...");
 
             let shutdown_oneshot_sender = async_main(
@@ -123,7 +122,7 @@ fn main() {
                     admin_ws_port: opt.admin_ws_port,
                     app_ws_port: opt.app_ws_port,
                     datastore_path: opt.datastore_path,
-                    keystore_url: opt.keystore_url,
+                    keystore_path: opt.keystore_path,
                     proxy_url: opt.proxy_url,
                     // membrane_proof: opt.membrane_proof,
                     event_channel: Some(state_signal_sender),

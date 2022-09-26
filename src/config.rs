@@ -11,15 +11,15 @@ use std::path::PathBuf;
 pub fn conductor_config(
     admin_port: u16,
     databases_path: &str,
-    keystore_url: &Url2,
+    lair_path: &Option<PathBuf>,
     proxy_url: &str,
-    maybe_boostrap_url: Option<Url2>,
+    maybe_boostrap_url: &Option<Url2>,
 ) -> ConductorConfig {
     // Build the conductor configuration
     let mut network_config = KitsuneP2pConfig::default();
     network_config.bootstrap_service = match maybe_boostrap_url {
         None => Some(url2::url2!("https://bootstrap-staging.holo.host")),
-        Some(url) => Some(url),
+        Some(url) => Some(url.to_owned()),
     };
     network_config.transport_pool.push(TransportConfig::Proxy {
         sub_transport: Box::new(TransportConfig::Quic {
@@ -35,8 +35,8 @@ pub fn conductor_config(
         environment_path: PathBuf::from(databases_path).into(),
         dpki: None,
         db_sync_strategy: DbSyncStrategy::default(),
-        keystore: KeystoreConfig::LairServer {
-            connection_url: keystore_url.to_owned(),
+        keystore: KeystoreConfig::LairServerInProc {
+            lair_root: lair_path.to_owned(),
         },
         admin_interfaces: Some(vec![AdminInterfaceConfig {
             driver: InterfaceDriver::Websocket { port: admin_port },
