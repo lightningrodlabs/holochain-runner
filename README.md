@@ -1,14 +1,14 @@
 # holochain-runner
 
-> Holochain Revision: [v0.0.162  September 14, 2022](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20220914013149)
+> Holochain Revision: [v0.0.165  September 30, 2022](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20220930014733)
 >
-> Expects an HAPP built with HDK [v0.0.152](https://docs.rs/hdk/0.0.152/hdk/index.html) and HDI [v0.1.2](https://docs.rs/hdi/0.1.2/hdi/index.html)
+> Expects an HAPP built with HDK [v0.0.154](https://docs.rs/hdk/0.0.154/hdk/index.html) and HDI [v0.1.3](https://docs.rs/hdi/0.1.3/hdi/index.html)
 
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.2.0
-wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
+holochain-runner 0.3.0
+wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch
 
 USAGE:
     holochain-runner [OPTIONS] <happ-path> [datastore-path]
@@ -20,12 +20,18 @@ FLAGS:
 OPTIONS:
         --admin-ws-port <admin-ws-port>     [default: 1234]
         --app-id <app-id>                   [default: main-app]
-        --app-ws-port <app-ws-port>        
-        --bootstrap-url <bootstrap-url>    
-        --keystore-path <keystore-path>     
+        --app-ws-port <app-ws-port>        The 0 default value here really means that
+                                           a random open port will be selected if you don't pass one.
+                                           The selected value will be reported out in the logs. [default: 0]
+        --bootstrap-url <bootstrap-url>     [default: https://bootstrap-staging.holo.host]
+        --keystore-path <keystore-path>    This folder will store the private keys. It is encrypted on both Mac and
+                                           Linux, but not Windows.
+                                           Per the behaviour of holochain itself, if you
+                                           do not pass a value here, it will use a default which is equal to the
+                                           value of `<datastore_path>/keystore`.
+        --network-seed <network-seed>
         --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
                                            qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
-        --network-seed <network-seed>
 
 ARGS:
     <happ-path>         the path to a HAPP file to be
