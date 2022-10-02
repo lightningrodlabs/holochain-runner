@@ -8,9 +8,9 @@ pub async fn find_or_generate_key(
     conductor_handle: &ConductorHandle,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
 ) -> ConductorApiResult<AgentPubKey> {
-    let cell_ids = conductor_handle.list_cell_ids(None);
-    let preset_agent_key = if cell_ids.len() > 0 {
-        Some(cell_ids.first().unwrap().agent_pubkey().to_owned())
+    let public_keys = conductor_handle.keystore().list_public_keys().await?;
+    let preset_agent_key = if public_keys.len() > 0 {
+        Some(public_keys.first().unwrap().to_owned())
     } else {
         None
     };

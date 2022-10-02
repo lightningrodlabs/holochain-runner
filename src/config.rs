@@ -29,6 +29,7 @@ pub fn conductor_config(
         },
     });
     ConductorConfig {
+        chc_namespace: None,
         environment_path: PathBuf::from(databases_path).into(),
         dpki: None,
         db_sync_strategy: DbSyncStrategy::default(),

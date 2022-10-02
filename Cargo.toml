@@ -17,13 +17,13 @@ tracing = "0.1.26"
 one_err = "0.0.5"
 sodoken = "=0.0.5"
 tokio = { version = "1.11", features = ["full"] }
-holochain_util = "0.0.11"
-holochain_p2p = "0.0.56"
-holochain_types = "0.0.56"
-holochain_zome_types = "0.0.48"
-holochain_keystore = "0.0.55"
-holochain = { version = "0.0.162" }
-hdk = "0.0.152"
+holochain_util = "0.0.12"
+holochain_p2p = "0.0.59"
+holochain_types = "0.0.59"
+holochain_zome_types = "0.0.50"
+holochain_keystore = "0.0.58"
+holochain = { version = "0.0.165" }
+hdk = "0.0.154"
 # termination feature enables handling of SIGTERM events as well on unix
 ctrlc = { version = "3.2.0", features = ["termination"] }
 
