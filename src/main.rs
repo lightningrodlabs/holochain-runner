@@ -33,13 +33,31 @@ configuration is found at this path"
     #[structopt(long, default_value = "main-app")]
     app_id: String,
 
-    #[structopt(long)]
-    app_ws_port: Option<u16>,
+    // the 0 default here will just let the
+    // system pick a port
+    #[structopt(
+        long,
+        default_value = "0",
+        help = "The 0 default value here really means that
+a random open port will be selected if you don't pass one.
+The selected value will be reported out in the logs."
+    )]
+    app_ws_port: u16,
 
-    #[structopt(long, default_value = "1234")]
+    #[structopt(
+        long,
+        default_value = "1234",
+        help = ""
+    )]
     admin_ws_port: u16,
 
-    #[structopt(long)]
+    #[structopt(
+        long,
+        help = "This folder will store the private keys. It is encrypted on both Mac and Linux, but not Windows.
+Per the behaviour of holochain itself, if you
+do not pass a value here, it will use a default which is equal to the
+value of `<datastore_path>/keystore`."
+    )]
     keystore_path: Option<PathBuf>,
 
     // #[structopt(long)]
@@ -48,14 +66,23 @@ configuration is found at this path"
     // community
     #[structopt(
         long,
-        default_value = "kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--"
+        default_value = "kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--",
+        help = ""
     )]
     proxy_url: String,
 
-    #[structopt(long, parse(from_str = Url2::parse))]
-    bootstrap_url: Option<Url2>,
+    #[structopt(
+        long,
+        parse(from_str = Url2::parse),
+        default_value = "https://bootstrap-staging.holo.host",
+        help = ""
+    )]
+    bootstrap_url: Url2,
 
-    #[structopt(long)]
+    #[structopt(
+        long,
+        help = ""
+    )]
     network_seed: Option<String>,
 }
 

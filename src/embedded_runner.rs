@@ -20,13 +20,13 @@ pub struct HcConfig {
     pub app_id: String,
     pub happ_path: PathBuf,
     pub admin_ws_port: u16,
-    pub app_ws_port: Option<u16>,
+    pub app_ws_port: u16,
     pub datastore_path: String,
     pub keystore_path: Option<PathBuf>,
     // pub membrane_proof: Option<String>,
     pub proxy_url: String,
     pub event_channel: Option<mpsc::Sender<StateSignal>>,
-    pub bootstrap_url: Option<Url2>,
+    pub bootstrap_url: Url2,
     pub network_seed: Option<NetworkSeed>,
 }
 
@@ -100,9 +100,7 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> on
         match install_or_passthrough(
             &conductor_copy,
             hc_config.app_id,
-            // the 0 default here will just let the
-            // system pick a port
-            hc_config.app_ws_port.unwrap_or(0),
+            hc_config.app_ws_port,
             hc_config.happ_path,
             // hc_config.membrane_proof,
             &hc_config.event_channel,
@@ -148,14 +146,14 @@ async fn conductor_handle(
     databases_path: &str,
     keystore_path: &Option<PathBuf>,
     proxy_url: &str,
-    maybe_boostrap_url: &Option<Url2>,
+    bootstrap_url: &Url2,
 ) -> ConductorHandle {
     let config = super::config::conductor_config(
         admin_ws_port,
         databases_path,
         keystore_path,
         proxy_url,
-        maybe_boostrap_url,
+        &bootstrap_url,
     );
     // Initialize the Conductor
     Conductor::builder()

@@ -13,14 +13,11 @@ pub fn conductor_config(
     databases_path: &str,
     lair_path: &Option<PathBuf>,
     proxy_url: &str,
-    maybe_boostrap_url: &Option<Url2>,
+    bootstrap_url: &Url2,
 ) -> ConductorConfig {
     // Build the conductor configuration
     let mut network_config = KitsuneP2pConfig::default();
-    network_config.bootstrap_service = match maybe_boostrap_url {
-        None => Some(url2::url2!("https://bootstrap-staging.holo.host")),
-        Some(url) => Some(url.to_owned()),
-    };
+    network_config.bootstrap_service = Some(bootstrap_url.to_owned());
     network_config.transport_pool.push(TransportConfig::Proxy {
         sub_transport: Box::new(TransportConfig::Quic {
             bind_to: Some(url2::url2!("kitsune-quic://0.0.0.0:0")),
