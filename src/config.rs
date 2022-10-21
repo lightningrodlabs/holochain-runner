@@ -37,7 +37,7 @@ pub fn conductor_config(
         db_sync_level: DbSyncLevel::default(),
         keystore: KeystoreConfig::LairServerLegacyDeprecated {
             keystore_path: Some(PathBuf::from(keystore_path)),
-            danger_passphrase_insecure_from_config: (String::from("passphrase-placeholder")),
+            danger_passphrase_insecure_from_config: (String::from("default-insecure-passphrase")),
         },
         admin_interfaces: Some(vec![AdminInterfaceConfig {
             driver: InterfaceDriver::Websocket { port: admin_port },
