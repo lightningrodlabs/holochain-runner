@@ -1,6 +1,6 @@
 # holochain-runner
 
-> Holochain Revision: [v0.0.175  November 29, 2022](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20221130011217)
+> Underlying Holochain Version: [v0.0.175  November 29, 2022](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20221130011217)
 >
 > Expects an HAPP built with HDK [v0.0.163](https://docs.rs/hdk/0.0.163/hdk/index.html) and HDI [v0.1.10](https://docs.rs/hdi/0.1.10/hdi/index.html)
 
