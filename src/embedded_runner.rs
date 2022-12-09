@@ -2,9 +2,9 @@ use crate::{
     emit::{emit, StateSignal},
     generate_key::find_or_generate_key,
 };
-use holochain::conductor::{
+use holochain::{conductor::{
     api::error::ConductorApiResult, manager::handle_shutdown, Conductor, ConductorHandle,
-};
+}, test_utils::itertools::Either};
 use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::observability::{
     self, Output,
 };
@@ -89,6 +89,7 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> on
         &hc_config.bootstrap_url,
     )
     .await;
+
     println!("DATASTORE_PATH: {}", hc_config.datastore_path);
     println!("KEYSTORE_PATH: {:?}", hc_config.keystore_path);
     println!("NETWORK_SEED: {:?}", hc_config.network_seed);
@@ -198,7 +199,7 @@ async fn install_or_passthrough(
         // add a websocket interface on the first run
         // it will boot again at the same interface on second run
         emit(&event_channel, StateSignal::AddingAppInterface).await;
-        using_app_ws_port = conductor.clone().add_app_interface(app_ws_port).await?;
+        using_app_ws_port = conductor.clone().add_app_interface(Either::Left(app_ws_port)).await?;
         println!("Enabled.");
     } else {
         println!("An existing configuration and identity was found, using that.");
@@ -209,7 +210,7 @@ async fn install_or_passthrough(
             using_app_ws_port = app_ports[0];
         } else {
             println!("No app port is attached, adding one.");
-            using_app_ws_port = conductor.clone().add_app_interface(app_ws_port).await?;
+            using_app_ws_port = conductor.clone().add_app_interface(Either::Left(app_ws_port)).await?;
         }
     }
 

@@ -14,16 +14,23 @@ serde = "1.0"
 futures = "0.3"
 human-panic = "1.0.3"
 tracing = "0.1.26"
-one_err = "0.0.5"
-sodoken = "=0.0.5"
+one_err = "0.0.7"
+sodoken = "=0.0.6"
 tokio = { version = "1.11", features = ["full"] }
-holochain_util = "0.0.12"
-holochain_p2p = "0.0.59"
-holochain_types = "0.0.59"
-holochain_zome_types = "0.0.50"
-holochain_keystore = "0.0.58"
-holochain = { version = "0.0.165" }
-hdk = "0.0.154"
+# holochain_util = "0.0.13"
+holochain_util = { branch = "re-expose-useful-apis", git = "https://github.com/holochain/holochain.git"}
+holochain_p2p =  { branch = "re-expose-useful-apis", git = "https://github.com/holochain/holochain.git"}
+holochain_types =  { branch = "re-expose-useful-apis", git = "https://github.com/holochain/holochain.git"}
+holochain_zome_types =  { branch = "re-expose-useful-apis", git = "https://github.com/holochain/holochain.git"}
+holochain_keystore =  { branch = "re-expose-useful-apis", git = "https://github.com/holochain/holochain.git"}
+holochain =  { branch = "re-expose-useful-apis", git = "https://github.com/holochain/holochain.git"}
+hdk =  { branch = "re-expose-useful-apis", git = "https://github.com/holochain/holochain.git"}
+# holochain_p2p = "0.0.68"
+# holochain_types = "0.0.69"
+# holochain_zome_types = "0.0.58"
+# holochain_keystore = "0.0.67"
+# holochain = { version = "0.0.175" }
+# hdk = "0.0.163"
 # termination feature enables handling of SIGTERM events as well on unix
 ctrlc = { version = "3.2.0", features = ["termination"] }
 
