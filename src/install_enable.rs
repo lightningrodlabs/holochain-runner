@@ -6,7 +6,7 @@ use holochain::conductor::{
     error::ConductorError,
     CellError, ConductorHandle,
 };
-use holochain_types::prelude::{InstallAppBundlePayload, AppBundleSource};
+use holochain_types::prelude::{InstallAppPayload, AppBundleSource};
 #[allow(deprecated)]
 use holochain_types::{
     app::InstalledAppId,
@@ -29,7 +29,7 @@ pub async fn install_app(
     // register any dnas
     emit(event_channel, StateSignal::InstallingApp).await;
     // Install the CellIds as an "app", with an installed_app_id
-    let payload: InstallAppBundlePayload = InstallAppBundlePayload {
+    let payload: InstallAppPayload = InstallAppPayload {
         source: AppBundleSource::Path(happ_path),
         agent_key,
         installed_app_id: Some(app_id),
