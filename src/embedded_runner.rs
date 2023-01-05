@@ -175,9 +175,9 @@ async fn install_or_passthrough(
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     network_seed: Option<NetworkSeed>,
 ) -> ConductorApiResult<()> {
-    let app_ids = conductor.list_running_apps().await?;
+    
+    let app_ids = conductor.list_apps(None).await?;
     // defaults
-    let mut using_app_id = app_id.clone();
     let using_app_ws_port: u16;
 
     let agent_key = find_or_generate_key(&conductor, event_channel).await?;
@@ -195,7 +195,7 @@ async fn install_or_passthrough(
         )
         .await?;
         println!("Installed, now enabling...");
-        super::install_enable::enable_app(&conductor, app_id, event_channel).await?;
+        super::install_enable::enable_app(&conductor, app_id.clone(), event_channel).await?;
         // add a websocket interface on the first run
         // it will boot again at the same interface on second run
         emit(&event_channel, StateSignal::AddingAppInterface).await;
@@ -203,8 +203,6 @@ async fn install_or_passthrough(
         println!("Enabled.");
     } else {
         println!("An existing configuration and identity was found, using that.");
-        // can confidently unwrap because of the app_ids.len() check
-        using_app_id = app_ids.first().unwrap().into();
         let app_ports = conductor.list_app_interfaces().await?;
         if app_ports.len() > 0 {
             using_app_ws_port = app_ports[0];
@@ -216,7 +214,7 @@ async fn install_or_passthrough(
 
     emit(&event_channel, StateSignal::IsReady).await;
     println!("     APP_WS_PORT: {}", using_app_ws_port);
-    println!("INSTALLED_APP_ID: {}", using_app_id);
+    println!("INSTALLED_APP_ID: {}", app_id);
     println!("HOLOCHAIN_RUNNER_IS_READY");
     Ok(())
 }
