@@ -17,7 +17,7 @@ pub async fn find_or_generate_key(
 
     match preset_agent_key {
         Some(agent_key) => {
-            println!("Recognized a keypair, using that...");
+            println!("Recognized a keypair, using that. The public key is: {:?}", agent_key);
             Ok(agent_key)
         }
         None => {
