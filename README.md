@@ -1,12 +1,12 @@
 # holochain-runner
 
-> Underlying Holochain Version: [v0.1.0-beta-rc.2  December 23, 2022](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20221223034701)
+> Underlying Holochain Version: [v0.1.0](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20230126223635)
 >
-> Expects an HAPP built with HDK [v0.1.0-beta-rc.1](https://docs.rs/hdk/0.1.0-beta-rc.1/hdk/index.html) and HDI [v0.2.0-beta-rc.1](https://docs.rs/hdi/0.2.0-beta-rc.1/hdi/index.html)
+> Expects an HAPP built with HDK [v0.1.0](https://docs.rs/hdk/0.1.0/hdk/index.html) and HDI [v0.2.0](https://docs.rs/hdi/0.2.0/hdi/index.html)
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.5.2
+holochain-runner 0.6.0
 wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch
 
 USAGE:

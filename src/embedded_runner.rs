@@ -10,7 +10,6 @@ use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::o
 };
 use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use holochain_types::app::InstalledAppId;
-// use holochain_util::tokio_helper;
 use holochain_zome_types::NetworkSeed;
 use std::path::{Path, PathBuf};
 use tokio::sync::{mpsc, oneshot};
@@ -29,37 +28,6 @@ pub struct HcConfig {
     pub bootstrap_url: Url2,
     pub network_seed: Option<NetworkSeed>,
 }
-
-// pub fn blocking_main(hc_config: HcConfig) {
-//     tokio_helper::block_forever_on(async {
-//         let sender = async_main(hc_config).await;
-//         let (passthrough_sender, mut passthrough_receiver) = tokio::sync::mpsc::channel::<bool>(1);
-//         tokio::task::spawn(async move {
-//             passthrough_receiver.recv().await;
-//             match sender.send(true) {
-//                 Ok(()) => {
-//                     println!("succesfully sent shutdown signal to holochain");
-//                 }
-//                 Err(_) => {
-//                     println!("the receiver of the oneshot sender must have been dropped");
-//                     panic!()
-//                 }
-//             };
-//         });
-//         // wait for SIGINT or SIGTERM
-//         ctrlc::set_handler(move || {
-//             // send shutdown signal
-//             let sender = passthrough_sender.clone();
-//             tokio::spawn(async move {
-//                 if let Err(_) = sender.send(true).await {
-//                     println!("receiver of the passthrough_sender dropped");
-//                     panic!()
-//                 }
-//             });
-//         })
-//         .expect("Error setting Ctrl-C handler");
-//     })
-// }
 
 pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> oneshot::Sender<bool> {
     // Sets up a human-readable panic message with a request for bug reports
@@ -117,28 +85,30 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> on
         }
     });
 
-    let shutdown_handle = conductor
-        .take_shutdown_handle()
-        // .await
-        .expect("The shutdown handle has already been taken.");
+    let tm = conductor.task_manager();
 
-    let (s, r) = tokio::sync::oneshot::channel::<bool>();
-    tokio::task::spawn(async move {
-        match r.await {
-            Ok(_) => {
-                info!("received message to perform shutdown");
-            }
-            Err(e) => {
-                error!("oneshot receiver encountered error: {}", e);
-            }
-        };
-        conductor.shutdown();
-        // Await on the main JoinHandle, keeping the process alive until all
-        // Conductor activity has ceased
-        let shutdown_result = shutdown_handle.await;
-        handle_shutdown(shutdown_result);
-    });
-    s
+    let (shutdown_sender, shutdown_receiver) = tokio::sync::oneshot::channel::<bool>();
+    if let Some(main_task) = conductor.detach_task_management() {
+        // this thread we spawn will wait for an eventual event
+        // to be sent and in that case it will shutdown.
+        // we don't block any threads waiting for this.
+        tokio::spawn(async move {
+            match shutdown_receiver.await {
+                Ok(_) => {
+                    error!("received message to perform shutdown");
+                }
+                Err(e) => {
+                    error!("oneshot receiver encountered error: {}", e);
+                }
+            };
+            tracing::error!("Gracefully shutting down conductor...");
+            tm.stop_all_tasks().await.ok();
+            tracing::error!("Conductor ready to shut down.");
+        });
+
+        handle_shutdown(main_task.await);
+    }
+    shutdown_sender
 }
 
 async fn conductor_handle(

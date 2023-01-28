@@ -1,8 +1,8 @@
 [package]
 name = "holochain-runner"
-version = "0.5.2"
-description = "Gives a binary providing wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch"
-authors = ["Connor Turland <connor@sprillow.com>"]
+version = "0.6.0"
+description = "a Holochain runtime binary with key management, good defaults, and Status Update events. Suitable for development and production environments"
+authors = ["Connor Turland <connor@sprillow.com>", "Wesley Finck <wesleyfinck@gmail.com>"]
 license = "CAL-1.0"
 repository = "https://github.com/lightningrodlabs/holochain-runner"
 edition = "2021"
@@ -17,13 +17,13 @@ tracing = "0.1.26"
 one_err = "0.0.7"
 sodoken = "=0.0.7"
 tokio = { version = "1.11", features = ["full"] }
-holochain_util = "0.1.0-beta-rc.0"
-holochain_p2p = "0.1.0-beta-rc.1"
-holochain_types = "0.1.0-beta-rc.1"
-holochain_zome_types = "0.1.0-beta-rc.1"
-holochain_keystore = "0.1.0-beta-rc.1"
-holochain = "0.1.0-beta-rc.2"
-hdk = "0.1.0-beta-rc.1"
+holochain_util = "0.1.0"
+holochain_p2p = "0.1.0"
+holochain_types = "0.1.0"
+holochain_zome_types = "0.1.0"
+holochain_keystore = "0.1.0"
+holochain = "0.1.0"
+hdk = "0.1.0"
 # termination feature enables handling of SIGTERM events as well on unix
 ctrlc = { version = "3.2.0", features = ["termination"] }
 
