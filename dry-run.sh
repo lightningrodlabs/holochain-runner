@@ -2,19 +2,10 @@
 
 set -euo pipefail
 
-# first, separately, run
-# `lair-server init`
-# set a passphrase
-# now, run:
-# `lair-keystore server`
-# input the passphrase
-# take the connection url from there,
-# and put it below instead of `add-connection-url-here`
-
 # when running this command, pass the passphrase like this:
 # echo mypassword | ./dry-run.sh
 
-cargo run --release -- \
-  --keystore-path test/data/keystore \
+RUST_LOG=debug cargo run --release -- \
+  --keystore-path ~/code/holochain-runner/test/data/keystore \
   test/test.happ test/data/databases
 #cargo run --release -- --keystore-path test/data/keystore test/hrea_suite.happ test/data/databases

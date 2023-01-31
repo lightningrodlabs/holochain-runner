@@ -3,7 +3,7 @@ use crate::{
     generate_key::find_or_generate_key,
 };
 use holochain::{conductor::{
-    api::error::ConductorApiResult, manager::handle_shutdown, Conductor, ConductorHandle,
+    api::error::ConductorApiResult, Conductor, ConductorHandle,
 }, test_utils::itertools::Either};
 use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::observability::{
     self, Output,
@@ -12,7 +12,7 @@ use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use holochain_types::app::InstalledAppId;
 use holochain_zome_types::NetworkSeed;
 use std::path::{Path, PathBuf};
-use tokio::sync::{mpsc, oneshot};
+use tokio::sync::mpsc;
 use tracing::*;
 
 pub struct HcConfig {
@@ -29,7 +29,7 @@ pub struct HcConfig {
     pub network_seed: Option<NetworkSeed>,
 }
 
-pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> oneshot::Sender<bool> {
+pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> ConductorHandle {
     // Sets up a human-readable panic message with a request for bug reports
     // See https://docs.rs/human-panic/1.0.3/human_panic/
     human_panic::setup_panic!();
@@ -85,30 +85,7 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> on
         }
     });
 
-    let tm = conductor.task_manager();
-
-    let (shutdown_sender, shutdown_receiver) = tokio::sync::oneshot::channel::<bool>();
-    if let Some(main_task) = conductor.detach_task_management() {
-        // this thread we spawn will wait for an eventual event
-        // to be sent and in that case it will shutdown.
-        // we don't block any threads waiting for this.
-        tokio::spawn(async move {
-            match shutdown_receiver.await {
-                Ok(_) => {
-                    error!("received message to perform shutdown");
-                }
-                Err(e) => {
-                    error!("oneshot receiver encountered error: {}", e);
-                }
-            };
-            tracing::error!("Gracefully shutting down conductor...");
-            tm.stop_all_tasks().await.ok();
-            tracing::error!("Conductor ready to shut down.");
-        });
-
-        handle_shutdown(main_task.await);
-    }
-    shutdown_sender
+    conductor
 }
 
 async fn conductor_handle(

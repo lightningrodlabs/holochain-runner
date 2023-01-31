@@ -1,5 +1,6 @@
 use embedded_runner::{async_main, HcConfig};
 use emit::StateSignal;
+use holochain::conductor::manager::handle_shutdown;
 use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -44,11 +45,7 @@ The selected value will be reported out in the logs."
     )]
     app_ws_port: u16,
 
-    #[structopt(
-        long,
-        default_value = "1234",
-        help = ""
-    )]
+    #[structopt(long, default_value = "1234", help = "")]
     admin_ws_port: u16,
 
     #[structopt(
@@ -79,10 +76,7 @@ value of `<datastore_path>/keystore`."
     )]
     bootstrap_url: Url2,
 
-    #[structopt(
-        long,
-        help = ""
-    )]
+    #[structopt(long, help = "")]
     network_seed: Option<String>,
 }
 
@@ -103,22 +97,6 @@ fn main() {
     // set up the ctrlc shutdown listener
     // listening for SIGINT or SIGTERM (unix), just CTRC-C on windows
     let rt_handle = rt.handle().clone();
-    let (shutdown_sender, mut shutdown_receiver) = tokio::sync::mpsc::channel::<bool>(1);
-    ctrlc::set_handler(move || {
-        println!("ctrlc got shutdown signal");
-        // send shutdown signal
-        let shutdown_sender_c = shutdown_sender.clone();
-        tokio::task::block_in_place(|| {
-            rt.block_on(async {
-                // trigger shutdown
-                match shutdown_sender_c.send(true).await {
-                    Ok(_) => {}
-                    Err(_) => {}
-                };
-            });
-        });
-    })
-    .expect("Error setting Ctrl-C handler");
 
     // print each state signal to the terminal
     let (state_signal_sender, mut state_signal_receiver) =
@@ -141,7 +119,7 @@ fn main() {
                 .expect("could not read piped passphrase");
             println!("Found passphrase, continuing...");
 
-            let shutdown_oneshot_sender = async_main(
+            let conductor = async_main(
                 passphrase,
                 HcConfig {
                     app_id: opt.app_id,
@@ -158,18 +136,12 @@ fn main() {
                 },
             )
             .await;
-            // wait for shutdown signal
-            shutdown_receiver.recv().await;
-            // pass that signal through to embedded-holochain-runner
-            match shutdown_oneshot_sender.send(true) {
-                Ok(()) => {
-                    println!("successfully sent shutdown signal to embedded-holochain-runner");
-                }
-                Err(_) => {
-                    println!("the receiver of the oneshot sender must have been dropped");
-                    panic!()
-                }
-            };
+            tokio::signal::ctrl_c().await.unwrap_or_else(|e| {
+                tracing::error!("Could not handle termination signal: {:?}", e)
+            });
+            tracing::info!("Gracefully shutting down conductor...");
+            let shutdown_result = conductor.shutdown().await;
+            handle_shutdown(shutdown_result);
         })
     });
 }
