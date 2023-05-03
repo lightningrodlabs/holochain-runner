@@ -63,10 +63,10 @@ value of `<datastore_path>/keystore`."
     // community
     #[structopt(
         long,
-        default_value = "kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--",
-        help = ""
+        default_value = "wss://signal.holotest.net",
+        help = "Websocket URL (wss) to a holochain tx5 WebRTC signal server"
     )]
-    proxy_url: String,
+    webrtc_signal_url: String,
 
     #[structopt(
         long,
@@ -128,7 +128,7 @@ fn main() {
                     app_ws_port: opt.app_ws_port,
                     datastore_path: opt.datastore_path,
                     keystore_path: opt.keystore_path,
-                    proxy_url: opt.proxy_url,
+                    webrtc_signal_url: opt.webrtc_signal_url,
                     // membrane_proof: opt.membrane_proof,
                     event_channel: Some(state_signal_sender),
                     bootstrap_url: opt.bootstrap_url,

@@ -2,15 +2,14 @@ use crate::{
     emit::{emit, StateSignal},
     generate_key::find_or_generate_key,
 };
-use holochain::{conductor::{
-    api::error::ConductorApiResult, Conductor, ConductorHandle,
-}, test_utils::itertools::Either};
-use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::dependencies::observability::{
-    self, Output,
+use holochain::{
+    conductor::{api::error::ConductorApiResult, Conductor, ConductorHandle},
+    test_utils::itertools::Either,
 };
 use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use holochain_types::app::InstalledAppId;
 use holochain_zome_types::NetworkSeed;
+use observability::Output;
 use std::path::{Path, PathBuf};
 use tokio::sync::mpsc;
 use tracing::*;
@@ -23,7 +22,7 @@ pub struct HcConfig {
     pub datastore_path: String,
     pub keystore_path: Option<PathBuf>,
     // pub membrane_proof: Option<String>,
-    pub proxy_url: String,
+    pub webrtc_signal_url: String,
     pub event_channel: Option<mpsc::Sender<StateSignal>>,
     pub bootstrap_url: Url2,
     pub network_seed: Option<NetworkSeed>,
@@ -53,7 +52,7 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
         hc_config.admin_ws_port,
         &hc_config.datastore_path,
         &hc_config.keystore_path,
-        &hc_config.proxy_url,
+        &hc_config.webrtc_signal_url,
         &hc_config.bootstrap_url,
     )
     .await;
@@ -93,14 +92,14 @@ async fn conductor_handle(
     admin_ws_port: u16,
     databases_path: &str,
     keystore_path: &Option<PathBuf>,
-    proxy_url: &str,
+    webrtc_signal_url: &str,
     bootstrap_url: &Url2,
 ) -> ConductorHandle {
     let config = super::config::conductor_config(
         admin_ws_port,
         databases_path,
         keystore_path,
-        proxy_url,
+        webrtc_signal_url,
         &bootstrap_url,
     );
     // Initialize the Conductor
@@ -122,7 +121,6 @@ async fn install_or_passthrough(
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     network_seed: Option<NetworkSeed>,
 ) -> ConductorApiResult<()> {
-    
     let app_ids = conductor.list_apps(None).await?;
     // defaults
     let using_app_ws_port: u16;
@@ -146,7 +144,10 @@ async fn install_or_passthrough(
         // add a websocket interface on the first run
         // it will boot again at the same interface on second run
         emit(&event_channel, StateSignal::AddingAppInterface).await;
-        using_app_ws_port = conductor.clone().add_app_interface(Either::Left(app_ws_port)).await?;
+        using_app_ws_port = conductor
+            .clone()
+            .add_app_interface(Either::Left(app_ws_port))
+            .await?;
         println!("Enabled.");
     } else {
         println!("An existing configuration and identity was found, using that.");
@@ -155,7 +156,10 @@ async fn install_or_passthrough(
             using_app_ws_port = app_ports[0];
         } else {
             println!("No app port is attached, adding one.");
-            using_app_ws_port = conductor.clone().add_app_interface(Either::Left(app_ws_port)).await?;
+            using_app_ws_port = conductor
+                .clone()
+                .add_app_interface(Either::Left(app_ws_port))
+                .await?;
         }
     }
 

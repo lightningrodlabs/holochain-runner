@@ -1,14 +1,14 @@
 # holochain-runner
 
-> Underlying Holochain Version: [v0.1.0](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20230126223635)
+> Underlying Holochain Version: [v0.2.0](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20230427171927)
 >
-> Expects an HAPP built with HDK [v0.1.0](https://docs.rs/hdk/0.1.0/hdk/index.html) and HDI [v0.2.0](https://docs.rs/hdi/0.2.0/hdi/index.html)
+> Expects an HAPP built with HDK [v0.2.0](https://docs.rs/hdk/0.2.0/hdk/index.html) and HDI [v0.3.0](https://docs.rs/hdi/0.3.0/hdi/index.html)
 
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.6.1
-wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch
+holochain-runner 0.7.0
+wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
 
 USAGE:
     holochain-runner [OPTIONS] <happ-path> [datastore-path]
@@ -18,20 +18,22 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-        --admin-ws-port <admin-ws-port>     [default: 1234]
-        --app-id <app-id>                   [default: main-app]
-        --app-ws-port <app-ws-port>        The 0 default value here really means that
-                                           a random open port will be selected if you don't pass one.
-                                           The selected value will be reported out in the logs. [default: 0]
-        --bootstrap-url <bootstrap-url>     [default: https://bootstrap-staging.holo.host]
-        --keystore-path <keystore-path>    This folder will store the private keys. It is encrypted on both Mac and
-                                           Linux, but not Windows.
-                                           Per the behaviour of holochain itself, if you
-                                           do not pass a value here, it will use a default which is equal to the
-                                           value of `<datastore_path>/keystore`.
-        --network-seed <network-seed>
-        --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
-                                           qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
+        --admin-ws-port <admin-ws-port>             [default: 1234]
+        --app-id <app-id>                           [default: main-app]
+        --app-ws-port <app-ws-port>
+            The 0 default value here really means that
+            a random open port will be selected if you don't pass one.
+            The selected value will be reported out in the logs. [default: 0]
+        --bootstrap-url <bootstrap-url>             [default: https://bootstrap-staging.holo.host]
+        --keystore-path <keystore-path>
+            This folder will store the private keys. It is encrypted on both Mac and Linux, but not Windows.
+            Per the behaviour of holochain itself, if you
+            do not pass a value here, it will use a default which is equal to the
+            value of `<datastore_path>/keystore`.
+        --network-seed <network-seed>              
+        --webrtc-signal-url <webrtc-signal-url>
+            Websocket URL (wss) to a holochain tx5 WebRTC signal server [default: wss://signal.holotest.net]
+
 
 ARGS:
     <happ-path>         the path to a HAPP file to be
@@ -40,6 +42,7 @@ ARGS:
     <datastore-path>    configuration values for `app_id` and `app_ws_port`
                         will be overridden if an existing
                         configuration is found at this path [default: databases]
+
 ```
 ## How it will work
 
