@@ -24,9 +24,9 @@ jobs:
           - windows-latest
         include:
           - os: ubuntu-latest
-            features: db-encryption
+            features: sqlite-encrypted
           - os: macos-latest
-            features: db-encryption
+            features: sqlite-encrypted
           # no database encryption available for windows at this time
     runs-on: ${{ matrix.os }}
     steps:

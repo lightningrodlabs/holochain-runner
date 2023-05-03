@@ -29,4 +29,4 @@ hdk = "0.2.0"
 ctrlc = { version = "3.2.0", features = ["termination"] }
 
 [features]
-db-encryption = [ "holochain/sqlite-encrypted"]
+sqlite-encrypted = [ "holochain/sqlite-encrypted"]
