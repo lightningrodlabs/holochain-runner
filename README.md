@@ -24,7 +24,7 @@ OPTIONS:
             The 0 default value here really means that
             a random open port will be selected if you don't pass one.
             The selected value will be reported out in the logs. [default: 0]
-        --bootstrap-url <bootstrap-url>             [default: https://bootstrap-staging.holo.host]
+        --bootstrap-url <bootstrap-url>             [default: https://bootstrap.holo.host]
         --keystore-path <keystore-path>
             This folder will store the private keys. It is encrypted on both Mac and Linux, but not Windows.
             Per the behaviour of holochain itself, if you
