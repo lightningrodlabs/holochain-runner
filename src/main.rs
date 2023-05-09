@@ -71,7 +71,7 @@ value of `<datastore_path>/keystore`."
     #[structopt(
         long,
         parse(from_str = Url2::parse),
-        default_value = "https://bootstrap-staging.holo.host",
+        default_value = "https://bootstrap.holo.host",
         help = ""
     )]
     bootstrap_url: Url2,
