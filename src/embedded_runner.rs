@@ -2,10 +2,8 @@ use crate::{
     emit::{emit, StateSignal},
     generate_key::find_or_generate_key,
 };
-use holochain::{
-    conductor::{api::error::ConductorApiResult, Conductor, ConductorHandle},
-    test_utils::itertools::Either,
-};
+use either::*;
+use holochain::conductor::{api::error::ConductorApiResult, Conductor, ConductorHandle};
 use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use holochain_types::app::InstalledAppId;
 use holochain_zome_types::NetworkSeed;
