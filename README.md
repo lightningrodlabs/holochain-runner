@@ -95,4 +95,4 @@ pub enum StateSignal {
 
 ## Bootstrap Networking Service
 
-This library is currently by default pointed at the `wss://signal.holotest.net` node discovery service, but can be overridden.
+This library is currently by default pointed at the `https://bootstrap.holo.host` node discovery service, but can be overridden.
