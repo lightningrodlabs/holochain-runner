@@ -7,7 +7,7 @@
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.7.1
+holochain-runner 0.7.2
 wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
 
 USAGE:
@@ -95,4 +95,4 @@ pub enum StateSignal {
 
 ## Bootstrap Networking Service
 
-This library is currently by default pointed at the `https://bootstrap-staging.holo.host` node discovery service, but can be overridden.
+This library is currently by default pointed at the `https://bootstrap.holo.host` node discovery service, but can be overridden.
