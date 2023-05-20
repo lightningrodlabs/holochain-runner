@@ -1,13 +1,13 @@
 # holochain-runner
 
-> Underlying Holochain Version: [v0.2.0](https://github.com/holochain/holochain/blob/main/CHANGELOG.md#20230427171927)
+> Underlying Holochain Version: [v0.2.1-beta-dev.0](https://github.com/holochain/holochain/blob/main-0.2/CHANGELOG.md#20230515083847)
 >
 > Expects an HAPP built with HDK [v0.2.0](https://docs.rs/hdk/0.2.0/hdk/index.html) and HDI [v0.3.0](https://docs.rs/hdi/0.3.0/hdi/index.html)
 
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.7.2
+holochain-runner 0.7.3
 wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
 
 USAGE:
@@ -32,7 +32,7 @@ OPTIONS:
             value of `<datastore_path>/keystore`.
         --network-seed <network-seed>              
         --webrtc-signal-url <webrtc-signal-url>
-            Websocket URL (wss) to a holochain tx5 WebRTC signal server [default: wss://signal.holotest.net]
+            Websocket URL (wss) to a holochain tx5 WebRTC signal server [default: wss://signal.holo.host]
 
 
 ARGS:
@@ -96,3 +96,7 @@ pub enum StateSignal {
 ## Bootstrap Networking Service
 
 This library is currently by default pointed at the `https://bootstrap.holo.host` node discovery service, but can be overridden.
+
+## Signal Service
+
+This library is currently by default pointed at the `wss://signal.holo.host` WebRTC signal service, but can be overridden.

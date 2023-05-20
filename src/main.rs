@@ -63,7 +63,7 @@ value of `<datastore_path>/keystore`."
     // community
     #[structopt(
         long,
-        default_value = "wss://signal.holotest.net",
+        default_value = "wss://signal.holo.host:",
         help = "Websocket URL (wss) to a holochain tx5 WebRTC signal server"
     )]
     webrtc_signal_url: String,
