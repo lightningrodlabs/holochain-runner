@@ -7,7 +7,7 @@
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.7.3
+holochain-runner 0.7.4
 wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
 
 USAGE:
