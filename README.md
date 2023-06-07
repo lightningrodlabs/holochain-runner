@@ -1,8 +1,8 @@
 # holochain-runner
 
-> Underlying Holochain Version: [v0.2.1-beta-dev.0](https://github.com/holochain/holochain/blob/main-0.2/CHANGELOG.md#20230515083847)
->
-> Expects an HAPP built with HDK [v0.2.0](https://docs.rs/hdk/0.2.0/hdk/index.html) and HDI [v0.3.0](https://docs.rs/hdi/0.3.0/hdi/index.html)
+<!-- > Underlying Holochain Version: [v0.2.1-beta-dev.0](https://github.com/holochain/holochain/blob/main-0.2/CHANGELOG.md#20230515083847) -->
+<!-- > -->
+<!-- > Expects an HAPP built with HDK [v0.2.0](https://docs.rs/hdk/0.2.0/hdk/index.html) and HDI [v0.3.0](https://docs.rs/hdi/0.3.0/hdi/index.html) -->
 
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
