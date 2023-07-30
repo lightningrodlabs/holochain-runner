@@ -19,7 +19,6 @@ pub fn conductor_config(
         signal_url: webrtc_signal_url.to_owned(),
     });
     ConductorConfig {
-        chc_namespace: None,
         environment_path: PathBuf::from(databases_path).into(),
         dpki: None,
         db_sync_strategy: DbSyncStrategy::default(),
