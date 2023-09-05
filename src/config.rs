@@ -30,5 +30,6 @@ pub fn conductor_config(
         }]),
         network: Some(network_config),
         tracing_override: None,
+        chc_url: None,
     }
 }
