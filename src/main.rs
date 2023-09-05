@@ -29,7 +29,7 @@ ending in .happ")]
 will be overridden if an existing
 configuration is found at this path"
     )]
-    datastore_path: String,
+    datastore_path: PathBuf,
 
     #[structopt(long, default_value = "main-app")]
     app_id: String,

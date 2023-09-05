@@ -8,7 +8,7 @@ use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use holochain_types::app::InstalledAppId;
 use holochain_zome_types::NetworkSeed;
 use observability::Output;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use tokio::sync::mpsc;
 use tracing::*;
 
@@ -17,7 +17,7 @@ pub struct HcConfig {
     pub happ_path: PathBuf,
     pub admin_ws_port: u16,
     pub app_ws_port: u16,
-    pub datastore_path: String,
+    pub datastore_path: PathBuf,
     pub keystore_path: Option<PathBuf>,
     // pub membrane_proof: Option<String>,
     pub webrtc_signal_url: String,
@@ -35,7 +35,7 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
     debug!("observability initialized");
     // Uncomment this to get regular networking info status updates in the logs
     // kitsune_p2p_types::metrics::init_sys_info_poll();
-    if !Path::new(&hc_config.datastore_path).exists() {
+    if !hc_config.datastore_path.as_path().exists() {
         emit(&hc_config.event_channel, StateSignal::IsFirstRun).await;
         if let Err(e) = std::fs::create_dir(&hc_config.datastore_path) {
             error!("{}", e);
@@ -48,14 +48,14 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
     let conductor = conductor_handle(
         passphrase,
         hc_config.admin_ws_port,
-        &hc_config.datastore_path,
+        hc_config.datastore_path.clone(),
         &hc_config.keystore_path,
         &hc_config.webrtc_signal_url,
         &hc_config.bootstrap_url,
     )
     .await;
 
-    println!("DATASTORE_PATH: {}", hc_config.datastore_path);
+    println!("DATASTORE_PATH: {}", hc_config.datastore_path.as_path().display());
     println!("KEYSTORE_PATH: {:?}", hc_config.keystore_path);
     println!("NETWORK_SEED: {:?}", hc_config.network_seed);
 
@@ -88,7 +88,7 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
 async fn conductor_handle(
     passphrase: sodoken::BufRead,
     admin_ws_port: u16,
-    databases_path: &str,
+    databases_path: PathBuf,
     keystore_path: &Option<PathBuf>,
     webrtc_signal_url: &str,
     bootstrap_url: &Url2,
