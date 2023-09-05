@@ -7,7 +7,7 @@ use std::path::PathBuf;
 
 pub fn conductor_config(
     admin_port: u16,
-    databases_path: &str,
+    databases_path: PathBuf,
     lair_path: &Option<PathBuf>,
     webrtc_signal_url: &str,
     bootstrap_url: &Url2,
@@ -19,7 +19,7 @@ pub fn conductor_config(
         signal_url: webrtc_signal_url.to_owned(),
     });
     ConductorConfig {
-        environment_path: PathBuf::from(databases_path).into(),
+        environment_path: databases_path.into(),
         dpki: None,
         db_sync_strategy: DbSyncStrategy::default(),
         keystore: KeystoreConfig::LairServerInProc {
