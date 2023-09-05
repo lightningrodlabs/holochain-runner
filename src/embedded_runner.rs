@@ -24,6 +24,7 @@ pub struct HcConfig {
     pub event_channel: Option<mpsc::Sender<StateSignal>>,
     pub bootstrap_url: Url2,
     pub network_seed: Option<NetworkSeed>,
+    pub gossip_arc_clamping: String,
 }
 
 pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> ConductorHandle {
@@ -52,6 +53,7 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
         &hc_config.keystore_path,
         &hc_config.webrtc_signal_url,
         &hc_config.bootstrap_url,
+        &hc_config.gossip_arc_clamping,
     )
     .await;
 
@@ -92,6 +94,7 @@ async fn conductor_handle(
     keystore_path: &Option<PathBuf>,
     webrtc_signal_url: &str,
     bootstrap_url: &Url2,
+    gossip_arc_clamping: &str,
 ) -> ConductorHandle {
     let config = super::config::conductor_config(
         admin_ws_port,
@@ -99,6 +102,7 @@ async fn conductor_handle(
         keystore_path,
         webrtc_signal_url,
         &bootstrap_url,
+        gossip_arc_clamping,
     );
     // Initialize the Conductor
     Conductor::builder()
