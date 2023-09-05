@@ -80,7 +80,7 @@ value of `<datastore_path>/keystore`."
     network_seed: Option<String>,
 
     #[structopt(
-        long, 
+        long,
         default_value = "none",
         possible_values(&["full", "empty", "none"]),
         help = "Fix the size of the gossip arc you are responsible for serving to either the full DHT (full), 

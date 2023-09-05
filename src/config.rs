@@ -1,7 +1,10 @@
 use holochain::conductor::config::{
     AdminInterfaceConfig, ConductorConfig, InterfaceDriver, KeystoreConfig,
 };
-use holochain_p2p::kitsune_p2p::{dependencies::url2::Url2, KitsuneP2pConfig, TransportConfig, dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams};
+use holochain_p2p::kitsune_p2p::{
+    dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams,
+    dependencies::url2::Url2, KitsuneP2pConfig, TransportConfig,
+};
 use holochain_types::db::DbSyncStrategy;
 use std::path::PathBuf;
 use std::sync::Arc;

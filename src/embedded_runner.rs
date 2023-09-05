@@ -101,7 +101,7 @@ async fn conductor_handle(
         databases_path,
         keystore_path,
         webrtc_signal_url,
-        &bootstrap_url,
+        bootstrap_url,
         gossip_arc_clamping,
     );
     // Initialize the Conductor
@@ -127,12 +127,12 @@ async fn install_or_passthrough(
     // defaults
     let using_app_ws_port: u16;
 
-    let agent_key = find_or_generate_key(&conductor, event_channel).await?;
+    let agent_key = find_or_generate_key(conductor, event_channel).await?;
 
-    if app_ids.len() == 0 {
+    if app_ids.is_empty() {
         println!("There is no app installed, so starting fresh...");
         super::install_enable::install_app(
-            &conductor,
+            conductor,
             agent_key,
             app_id.clone(),
             happ_path,
@@ -142,10 +142,10 @@ async fn install_or_passthrough(
         )
         .await?;
         println!("Installed, now enabling...");
-        super::install_enable::enable_app(&conductor, app_id.clone(), event_channel).await?;
+        super::install_enable::enable_app(conductor, app_id.clone(), event_channel).await?;
         // add a websocket interface on the first run
         // it will boot again at the same interface on second run
-        emit(&event_channel, StateSignal::AddingAppInterface).await;
+        emit(event_channel, StateSignal::AddingAppInterface).await;
         using_app_ws_port = conductor
             .clone()
             .add_app_interface(Either::Left(app_ws_port))
@@ -154,7 +154,7 @@ async fn install_or_passthrough(
     } else {
         println!("An existing configuration and identity was found, using that.");
         let app_ports = conductor.list_app_interfaces().await?;
-        if app_ports.len() > 0 {
+        if !app_ports.is_empty() {
             using_app_ws_port = app_ports[0];
         } else {
             println!("No app port is attached, adding one.");
@@ -165,7 +165,7 @@ async fn install_or_passthrough(
         }
     }
 
-    emit(&event_channel, StateSignal::IsReady).await;
+    emit(event_channel, StateSignal::IsReady).await;
     println!("     APP_WS_PORT: {}", using_app_ws_port);
     println!("INSTALLED_APP_ID: {}", app_id);
     println!("HOLOCHAIN_RUNNER_IS_READY");

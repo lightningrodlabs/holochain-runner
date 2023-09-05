@@ -9,7 +9,7 @@ pub async fn find_or_generate_key(
     event_channel: &Option<mpsc::Sender<StateSignal>>,
 ) -> ConductorApiResult<AgentPubKey> {
     let public_keys = conductor_handle.keystore().list_public_keys().await?;
-    let preset_agent_key = if public_keys.len() > 0 {
+    let preset_agent_key = if !public_keys.is_empty() {
         Some(public_keys.first().unwrap().to_owned())
     } else {
         None
@@ -17,7 +17,10 @@ pub async fn find_or_generate_key(
 
     match preset_agent_key {
         Some(agent_key) => {
-            println!("Recognized a keypair, using that. The public key is: {:?}", agent_key);
+            println!(
+                "Recognized a keypair, using that. The public key is: {:?}",
+                agent_key
+            );
             Ok(agent_key)
         }
         None => {
