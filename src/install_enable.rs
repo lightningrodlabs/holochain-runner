@@ -6,11 +6,9 @@ use holochain::conductor::{
     error::ConductorError,
     CellError, ConductorHandle,
 };
-use holochain_types::prelude::{InstallAppPayload, AppBundleSource};
 #[allow(deprecated)]
-use holochain_types::{
-    app::InstalledAppId,
-};
+use holochain_types::app::InstalledAppId;
+use holochain_types::prelude::{AppBundleSource, InstallAppPayload};
 use tokio::sync::mpsc;
 
 use crate::emit::{emit, StateSignal};
@@ -24,7 +22,6 @@ pub async fn install_app(
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     network_seed: Option<NetworkSeed>,
 ) -> ConductorApiResult<()> {
-    
     println!("continuing with the installation...");
     // register any dnas
     emit(event_channel, StateSignal::InstallingApp).await;
@@ -57,7 +54,7 @@ pub async fn enable_app(
         .get_app_info(&app_id)
         .await?
         .ok_or(ConductorError::AppNotInstalled(app_id))?;
-    if errors.len() > 0 {
+    if !errors.is_empty() {
         if let Some((_cell_id, cell_error)) = errors.pop() {
             Err(cell_error.into())
         } else {

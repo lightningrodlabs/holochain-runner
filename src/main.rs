@@ -78,6 +78,15 @@ value of `<datastore_path>/keystore`."
 
     #[structopt(long, help = "")]
     network_seed: Option<String>,
+
+    #[structopt(
+        long,
+        default_value = "none",
+        possible_values(&["full", "empty", "none"]),
+        help = "Fix the size of the gossip arc you are responsible for serving to either the full DHT (full), 
+or none of it (empty). Default behavior is to auto-adjust your gossip arc based on network conditions."
+    )]
+    gossip_arc_clamping: String,
 }
 
 fn main() {
@@ -133,6 +142,7 @@ fn main() {
                     event_channel: Some(state_signal_sender),
                     bootstrap_url: opt.bootstrap_url,
                     network_seed: opt.network_seed,
+                    gossip_arc_clamping: opt.gossip_arc_clamping,
                 },
             )
             .await;
