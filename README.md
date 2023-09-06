@@ -7,7 +7,7 @@
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.7.6
+holochain-runner 0.7.7
 wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
 
 USAGE:
@@ -33,6 +33,9 @@ OPTIONS:
         --network-seed <network-seed>              
         --webrtc-signal-url <webrtc-signal-url>
             Websocket URL (wss) to a holochain tx5 WebRTC signal server [default: wss://signal.holo.host]
+        --gossip-arc-clamping <gossip-arc-clamping>
+            Fix the size of the gossip arc you are responsible for serving to either the full DHT (full), or none of it (empty). Default behavior is to auto-adjust your gossip arc based on network conditions.
+            [default: auto]  [possible values: full, empty, none]
 
 
 ARGS:
