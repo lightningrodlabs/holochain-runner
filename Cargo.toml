@@ -1,6 +1,6 @@
 [package]
 name = "holochain-runner"
-version = "0.7.7"
+version = "0.7.8"
 description = "a Holochain runtime binary with key management, good defaults, and Status Update events. Suitable for development and production environments"
 authors = ["Connor Turland <connor@sprillow.com>", "Wesley Finck <wesleyfinck@gmail.com>", "Karl Bonnici <karlbonnici100@gmail.com>"]
 license = "CAL-1.0"
@@ -19,13 +19,13 @@ sodoken = "=0.0.9"
 tokio = { version = "1.28", features = ["full"] }
 observability = "0.1.3"
 either = "1.5.0"
-holochain_util = "=0.2.2-beta-rc.0"
-holochain_p2p = "=0.2.2-beta-rc.1"
-holochain_types = "=0.2.2-beta-rc.1"
-holochain_zome_types = "=0.2.2-beta-rc.1"
-holochain_keystore = "=0.2.2-beta-rc.1"
-holochain = "=0.2.2-beta-rc.1"
-hdk = "=0.2.2-beta-rc.1"
+holochain_util = "=0.2.2"
+holochain_p2p = "=0.2.2"
+holochain_types = "=0.2.2"
+holochain_zome_types = "=0.2.2"
+holochain_keystore = "=0.2.2"
+holochain = "=0.2.2"
+hdk = "=0.2.2"
 contrafact = "=0.2.0-rc.1"
 # termination feature enables handling of SIGTERM events as well on unix
 ctrlc = { version = "3.2.0", features = ["termination"] }
