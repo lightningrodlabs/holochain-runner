@@ -32,7 +32,6 @@ pub async fn install_app(
         installed_app_id: Some(app_id),
         membrane_proofs: HashMap::new(),
         network_seed,
-        ignore_genesis_failure: false,
     };
     conductor_handle
         .clone()
