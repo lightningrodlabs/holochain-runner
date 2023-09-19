@@ -7,8 +7,8 @@
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.7.8
-wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
+holochain-runner 0.8.0
+wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch
 
 USAGE:
     holochain-runner [OPTIONS] <happ-path> [datastore-path]
@@ -18,25 +18,20 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-        --admin-ws-port <admin-ws-port>             [default: 1234]
-        --app-id <app-id>                           [default: main-app]
-        --app-ws-port <app-ws-port>
-            The 0 default value here really means that
-            a random open port will be selected if you don't pass one.
-            The selected value will be reported out in the logs. [default: 0]
-        --bootstrap-url <bootstrap-url>             [default: https://bootstrap.holo.host]
-        --keystore-path <keystore-path>
-            This folder will store the private keys. It is encrypted on both Mac and Linux, but not Windows.
-            Per the behaviour of holochain itself, if you
-            do not pass a value here, it will use a default which is equal to the
-            value of `<datastore_path>/keystore`.
-        --network-seed <network-seed>              
-        --webrtc-signal-url <webrtc-signal-url>
-            Websocket URL (wss) to a holochain tx5 WebRTC signal server [default: wss://signal.holo.host]
-        --gossip-arc-clamping <gossip-arc-clamping>
-            Fix the size of the gossip arc you are responsible for serving to either the full DHT (full), or none of it (empty). Default behavior is to auto-adjust your gossip arc based on network conditions.
-            [default: auto]  [possible values: full, empty, none]
-
+        --admin-ws-port <admin-ws-port>     [default: 1234]
+        --app-id <app-id>                   [default: main-app]
+        --app-ws-port <app-ws-port>        The 0 default value here really means that
+                                           a random open port will be selected if you don't pass one.
+                                           The selected value will be reported out in the logs. [default: 0]
+        --bootstrap-url <bootstrap-url>     [default: https://bootstrap.holo.host]
+        --keystore-path <keystore-path>    This folder will store the private keys. It is encrypted on both Mac and
+                                           Linux, but not Windows.
+                                           Per the behaviour of holochain itself, if you
+                                           do not pass a value here, it will use a default which is equal to the
+                                           value of `<datastore_path>/keystore`.
+        --network-seed <network-seed>
+        --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
+                                           qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
 
 ARGS:
     <happ-path>         the path to a HAPP file to be
@@ -100,6 +95,6 @@ pub enum StateSignal {
 
 This library is currently by default pointed at the `https://bootstrap.holo.host` node discovery service, but can be overridden.
 
-## Signal Service
+## Proxy Service
 
-This library is currently by default pointed at the `wss://signal.holo.host` WebRTC signal service, but can be overridden.
+This library is currently by default pointed at the `kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--` WebRTC signal service, but can be overridden.
