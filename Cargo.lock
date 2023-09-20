@@ -2025,7 +2025,7 @@ dependencies = [
  "holochain_sqlite",
  "holochain_state",
  "holochain_types",
- "holochain_util",
+ "holochain_util 0.1.2",
  "holochain_wasm_test_utils",
  "holochain_wasmer_host",
  "holochain_websocket",
@@ -2090,7 +2090,7 @@ dependencies = [
  "holochain_keystore",
  "holochain_p2p",
  "holochain_types",
- "holochain_util",
+ "holochain_util 0.2.2",
  "holochain_zome_types",
  "human-panic",
  "observability",
@@ -2218,7 +2218,7 @@ dependencies = [
  "holochain_keystore",
  "holochain_serialized_bytes 0.0.51",
  "holochain_types",
- "holochain_util",
+ "holochain_util 0.1.2",
  "holochain_zome_types",
  "kitsune_p2p",
  "kitsune_p2p_types",
@@ -2305,7 +2305,7 @@ dependencies = [
  "getrandom 0.2.10",
  "holo_hash",
  "holochain_serialized_bytes 0.0.51",
- "holochain_util",
+ "holochain_util 0.1.2",
  "holochain_zome_types",
  "kitsune_p2p",
  "lazy_static",
@@ -2359,7 +2359,7 @@ dependencies = [
  "holochain_serialized_bytes 0.0.51",
  "holochain_sqlite",
  "holochain_types",
- "holochain_util",
+ "holochain_util 0.1.2",
  "holochain_zome_types",
  "kitsune_p2p",
  "mockall",
@@ -2402,7 +2402,7 @@ dependencies = [
  "holochain_keystore",
  "holochain_serialized_bytes 0.0.51",
  "holochain_sqlite",
- "holochain_util",
+ "holochain_util 0.1.2",
  "holochain_zome_types",
  "isotest",
  "itertools 0.10.5",
@@ -2451,13 +2451,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "holochain_util"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c507f39c150414b64bb2fe8da311dc4e925435be887f8dfc3a97f8183d829878"
+dependencies = [
+ "cfg-if 0.1.10",
+ "derive_more",
+ "dunce",
+ "futures",
+ "num_cpus",
+ "once_cell",
+ "tokio",
+]
+
+[[package]]
 name = "holochain_wasm_test_utils"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "91d20bf6c75b4ba1027417e2b431d6a23ab368dfa3a3f4fe8c0872307493a830"
 dependencies = [
  "holochain_types",
- "holochain_util",
+ "holochain_util 0.1.2",
  "strum",
  "strum_macros 0.18.0",
  "toml 0.5.11",
@@ -3525,7 +3540,7 @@ dependencies = [
  "either",
  "flate2",
  "futures",
- "holochain_util",
+ "holochain_util 0.1.2",
  "reqwest",
  "rmp-serde 0.15.5",
  "serde",
