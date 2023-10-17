@@ -30,8 +30,7 @@ OPTIONS:
                                            do not pass a value here, it will use a default which is equal to the
                                            value of `<datastore_path>/keystore`.
         --network-seed <network-seed>
-        --proxy-url <proxy-url>             [default: kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-
-                                           qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--]
+        --proxy-url <proxy-url>             [default: kitsune-proxy://f3gH2VMkJ4qvZJOXx0ccL_Zo5n-s_CnBjSzAsEHHDCA/kitsune-quic/h/137.184.142.208/p/5788/--]
 
 ARGS:
     <happ-path>         the path to a HAPP file to be
