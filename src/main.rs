@@ -64,7 +64,7 @@ value of `<datastore_path>/keystore`."
     #[structopt(
         long,
         parse(from_str = Url2::parse),
-        default_value = "kitsune-proxy://SYVd4CF3BdJ4DS7KwLLgeU3_DbHoZ34Y-qroZ79DOs8/kitsune-quic/h/165.22.32.11/p/5779/--",
+        default_value = "kitsune-proxy://f3gH2VMkJ4qvZJOXx0ccL_Zo5n-s_CnBjSzAsEHHDCA/kitsune-quic/h/137.184.142.208/p/5788/--",
         help = ""
     )]
     proxy_url: Url2,
