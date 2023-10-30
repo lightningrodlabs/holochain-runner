@@ -1,9 +1,13 @@
+use dotenv;
 use embedded_runner::{async_main, HcConfig};
 use emit::StateSignal;
 use holochain::conductor::manager::handle_shutdown;
 use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
+use std::env;
 use std::path::PathBuf;
 use structopt::StructOpt;
+use dotenv;
+use std::env;
 
 mod config;
 mod embedded_runner;
@@ -87,6 +91,13 @@ value of `<datastore_path>/keystore`."
 or none of it (empty). Default behavior is to auto-adjust your gossip arc based on network conditions."
     )]
     gossip_arc_clamping: String,
+
+    #[structopt(
+        long,
+        short,
+        help = "Path to a local .env file containing a LAIR_PASSWORD variable"
+    )]
+    env_path: Option<PathBuf>,
 }
 
 fn main() {
@@ -118,16 +129,34 @@ fn main() {
 
     let opt = Opt::from_args();
 
+    // Load .env file if provided
+
+    let passphrase: sodoken::BufRead = match opt.env_path {
+        Some(path) => {
+            println!("Looking for passphrase from env file");
+            let env_val = dotenv::from_path(path.as_path())
+                .expect(format!("Failed to parse env file from {path:?}").as_str());
+            env_val.load();
+            let p = env::var("LAIR_PASSWORD").expect("No env var LAIR_PASSWORD found in env file");
+            println!("Found passphrase, continuing...");
+
+            p.as_bytes().to_vec().into()
+        }
+        None => {
+            println!("Looking for passphrase piped to stdin");
+            let p: sodoken::BufRead = read_passphrase_secure::read_piped_passphrase()
+                .expect("could not read piped passphrase");
+            println!("Found passphrase, continuing...");
+
+            p
+        }
+    };
+
     // An infinite stream of hangup signals.
 
     // Get a handle from this runtime
     tokio::task::block_in_place(|| {
         rt_handle.block_on(async {
-            println!("Looking for passphrase piped to stdin");
-            let passphrase = read_passphrase_secure::read_piped_passphrase()
-                .expect("could not read piped passphrase");
-            println!("Found passphrase, continuing...");
-
             let conductor = async_main(
                 passphrase,
                 HcConfig {

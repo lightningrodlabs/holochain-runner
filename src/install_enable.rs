@@ -18,14 +18,11 @@ pub async fn install_app(
     agent_key: AgentPubKey,
     app_id: InstalledAppId,
     happ_path: PathBuf,
-    // membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     network_seed: Option<NetworkSeed>,
 ) -> ConductorApiResult<()> {
     println!("continuing with the installation...");
-    // register any dnas
     emit(event_channel, StateSignal::InstallingApp).await;
-    // Install the CellIds as an "app", with an installed_app_id
     let payload: InstallAppPayload = InstallAppPayload {
         source: AppBundleSource::Path(happ_path),
         agent_key,
