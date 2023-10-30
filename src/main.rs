@@ -1,4 +1,3 @@
-use dotenv;
 use embedded_runner::{async_main, HcConfig};
 use emit::StateSignal;
 use holochain::conductor::manager::handle_shutdown;
@@ -7,7 +6,6 @@ use std::env;
 use std::path::PathBuf;
 use structopt::StructOpt;
 use dotenv;
-use std::env;
 
 mod config;
 mod embedded_runner;
@@ -61,10 +59,6 @@ value of `<datastore_path>/keystore`."
     )]
     keystore_path: Option<PathBuf>,
 
-    // #[structopt(long)]
-    // membrane_proof: Option<String>,
-
-    // community
     #[structopt(
         long,
         default_value = "wss://signal.holo.host:",
@@ -167,7 +161,6 @@ fn main() {
                     datastore_path: opt.datastore_path,
                     keystore_path: opt.keystore_path,
                     webrtc_signal_url: opt.webrtc_signal_url,
-                    // membrane_proof: opt.membrane_proof,
                     event_channel: Some(state_signal_sender),
                     bootstrap_url: opt.bootstrap_url,
                     network_seed: opt.network_seed,
