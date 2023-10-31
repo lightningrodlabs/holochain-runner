@@ -7,7 +7,7 @@ use holochain::conductor::{api::error::ConductorApiResult, Conductor, ConductorH
 use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use holochain_types::app::InstalledAppId;
 use holochain_zome_types::NetworkSeed;
-use observability::Output;
+use holochain_trace::Output;
 use std::path::PathBuf;
 use tokio::sync::mpsc;
 use tracing::*;
@@ -25,6 +25,7 @@ pub struct HcConfig {
     pub bootstrap_url: Url2,
     pub network_seed: Option<NetworkSeed>,
     pub gossip_arc_clamping: String,
+    pub logging: Output,
 }
 
 pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> ConductorHandle {
@@ -32,8 +33,8 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
     // See https://docs.rs/human-panic/1.0.3/human_panic/
     human_panic::setup_panic!();
     // take in command line arguments
-    observability::init_fmt(Output::Log).expect("Failed to start contextual logging");
-    debug!("observability initialized");
+    holochain_trace::init_fmt(hc_config.logging).expect("Failed to start contextual logging");
+    debug!("holochain_trace initialized");
     // Uncomment this to get regular networking info status updates in the logs
     // kitsune_p2p_types::metrics::init_sys_info_poll();
     if !hc_config.datastore_path.as_path().exists() {

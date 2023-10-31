@@ -2259,7 +2259,7 @@ dependencies = [
 
 [[package]]
 name = "holochain-runner"
-version = "0.7.9"
+version = "0.7.12"
 dependencies = [
  "base64 0.21.2",
  "contrafact",
@@ -2271,6 +2271,7 @@ dependencies = [
  "holochain",
  "holochain_keystore",
  "holochain_p2p",
+ "holochain_trace",
  "holochain_types",
  "holochain_util",
  "holochain_zome_types",

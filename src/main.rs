@@ -2,6 +2,7 @@ use embedded_runner::{async_main, HcConfig};
 use emit::StateSignal;
 use holochain::conductor::manager::handle_shutdown;
 use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
+use holochain_trace::Output;
 use std::env;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -92,6 +93,18 @@ or none of it (empty). Default behavior is to auto-adjust your gossip arc based 
         help = "Path to a local .env file containing a LAIR_PASSWORD variable"
     )]
     env_path: Option<PathBuf>,
+
+    #[structopt(
+        long,
+        help = "Outputs structured json from logging:
+    - None: No logging at all (fastest)
+    - Log: Output logs to stdout with spans (human readable)
+    - Compact: Same as Log but with less information
+    - Json: Output logs as structured json (machine readable)
+    ",
+        default_value = "Log"
+    )]
+    logging: Output,
 }
 
 fn main() {
@@ -165,6 +178,7 @@ fn main() {
                     bootstrap_url: opt.bootstrap_url,
                     network_seed: opt.network_seed,
                     gossip_arc_clamping: opt.gossip_arc_clamping,
+                    logging: opt.logging,
                 },
             )
             .await;
