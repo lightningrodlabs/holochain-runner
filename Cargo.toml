@@ -26,7 +26,7 @@ holochain_zome_types = "0.2.3-beta-rc.0"
 holochain_keystore = "0.2.3-beta-rc.0"
 holochain_trace = "0.2.2"
 holochain = "0.2.3-beta-rc.1"
-hdk = "0.2.3-beta-rc.0"
+hdk = "0.3.0-beta-dev.29"
 contrafact = "0.2.0-rc.1"
 # termination feature enables handling of SIGTERM events as well on unix
 ctrlc = { version = "3.4.1", features = ["termination"] }
