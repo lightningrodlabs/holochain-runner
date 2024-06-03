@@ -1,14 +1,14 @@
 # holochain-runner
 
-<!-- > Underlying Holochain Version: [v0.2.1](https://github.com/holochain/holochain/blob/main-0.2/CHANGELOG.md#20230515083847) -->
+<!-- > Underlying Holochain Version: [v0.4.0-dev.5](https://github.com/holochain/holochain/blob/develop/CHANGELOG.md#holochain-040-dev5) -->
 <!-- > -->
-<!-- > Expects an HAPP built with HDK [v0.2.1](https://docs.rs/hdk/0.2.0/hdk/index.html) and HDI [v0.3.1](https://docs.rs/hdi/0.3.0/hdi/index.html) -->
+<!-- > Expects an HAPP built with HDK [v0.4.0-dev.5](https://docs.rs/hdk/0.4.0-dev.5/hdk/index.html) and HDI [v0.5.0-dev.5](https://docs.rs/hdi/0.5.0-dev.5/hdi/index.html) -->
 
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.7.8
-wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch 
+holochain-runner 0.9.0
+wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch
 
 USAGE:
     holochain-runner [OPTIONS] <happ-path> [datastore-path]
@@ -30,7 +30,7 @@ OPTIONS:
             Per the behaviour of holochain itself, if you
             do not pass a value here, it will use a default which is equal to the
             value of `<datastore_path>/keystore`.
-        --network-seed <network-seed>              
+        --network-seed <network-seed>
         --webrtc-signal-url <webrtc-signal-url>
             Websocket URL (wss) to a holochain tx5 WebRTC signal server [default: wss://signal.holo.host]
         --gossip-arc-clamping <gossip-arc-clamping>
@@ -47,6 +47,7 @@ ARGS:
                         configuration is found at this path [default: databases]
 
 ```
+
 ## How it will work
 
 Lair Keystore setup requires use of a passphrase for encryption and security.
