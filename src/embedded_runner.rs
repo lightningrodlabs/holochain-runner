@@ -5,9 +5,9 @@ use crate::{
 use either::*;
 use holochain::conductor::{api::error::ConductorApiResult, Conductor, ConductorHandle};
 use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
-use holochain_types::app::InstalledAppId;
-use holochain_zome_types::NetworkSeed;
 use holochain_trace::Output;
+use holochain_types::{app::InstalledAppId, websocket::AllowedOrigins};
+use holochain_zome_types::info::NetworkSeed;
 use std::path::PathBuf;
 use tokio::sync::mpsc;
 use tracing::*;
@@ -19,7 +19,6 @@ pub struct HcConfig {
     pub app_ws_port: u16,
     pub datastore_path: PathBuf,
     pub keystore_path: Option<PathBuf>,
-    // pub membrane_proof: Option<String>,
     pub webrtc_signal_url: String,
     pub event_channel: Option<mpsc::Sender<StateSignal>>,
     pub bootstrap_url: Url2,
@@ -58,7 +57,10 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
     )
     .await;
 
-    println!("DATASTORE_PATH: {}", hc_config.datastore_path.as_path().display());
+    println!(
+        "DATASTORE_PATH: {}",
+        hc_config.datastore_path.as_path().display()
+    );
     println!("KEYSTORE_PATH: {:?}", hc_config.keystore_path);
     println!("NETWORK_SEED: {:?}", hc_config.network_seed);
 
@@ -71,7 +73,6 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
             hc_config.app_id,
             hc_config.app_ws_port,
             hc_config.happ_path,
-            // hc_config.membrane_proof,
             &hc_config.event_channel,
             hc_config.network_seed,
         )
@@ -120,7 +121,6 @@ async fn install_or_passthrough(
     app_id: InstalledAppId,
     app_ws_port: u16,
     happ_path: PathBuf,
-    // membrane_proof: Option<String>,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     network_seed: Option<NetworkSeed>,
 ) -> ConductorApiResult<()> {
@@ -137,7 +137,6 @@ async fn install_or_passthrough(
             agent_key,
             app_id.clone(),
             happ_path,
-            // membrane_proof,
             event_channel,
             network_seed,
         )
@@ -149,19 +148,23 @@ async fn install_or_passthrough(
         emit(event_channel, StateSignal::AddingAppInterface).await;
         using_app_ws_port = conductor
             .clone()
-            .add_app_interface(Either::Left(app_ws_port))
+            .add_app_interface(Either::Left(app_ws_port), AllowedOrigins::Any, None)
             .await?;
         println!("Enabled.");
     } else {
         println!("An existing configuration and identity was found, using that.");
         let app_ports = conductor.list_app_interfaces().await?;
         if !app_ports.is_empty() {
-            using_app_ws_port = app_ports[0];
+            using_app_ws_port = app_ports[0].port;
         } else {
             println!("No app port is attached, adding one.");
             using_app_ws_port = conductor
                 .clone()
-                .add_app_interface(Either::Left(app_ws_port))
+                .add_app_interface(
+                    Either::Left(app_ws_port),
+                    AllowedOrigins::Any,
+                    Some(app_id.clone()),
+                )
                 .await?;
         }
     }
