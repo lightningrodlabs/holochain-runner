@@ -1,9 +1,10 @@
 name: Release
 
-on:
-  push:
-    tags:
-      - v[0-9]+.*
+# on:
+#   push:
+#     tags:
+#       - v[0-9]+.*
+on: push
 
 jobs:
   create-release:
@@ -31,6 +32,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
+      - name: Install dependencies on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install strawberryperl
+          cpanm --notest Locale::Maketext::Simple
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           # (required)
