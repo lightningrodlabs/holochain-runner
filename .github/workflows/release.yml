@@ -19,9 +19,9 @@ jobs:
     strategy:
       matrix:
         os:
-          # - ubuntu-latest
-          # - macos-latest
-          - windows-2019
+          - ubuntu-latest
+          - macos-latest
+          # - windows-2019
         include:
           - os: ubuntu-latest
             features: sqlite-encrypted
@@ -31,11 +31,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-      # - name: Install dependencies on Windows
-      #   if: matrix.os == 'windows-latest'
-      #   run: |
-      #     choco install strawberryperl
-      #     cpanm --notest Locale::Maketext::Simple
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           # (required)
