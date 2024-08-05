@@ -36,6 +36,10 @@ jobs:
         with:
           go-version: "1.22.2"
       - uses: dtolnay/rust-toolchain@1.79
+      - name: Install Perl dependencies
+        if: matrix.os == 'windows-latest'
+        run: |
+          cpanm Locale::Maketext::Simple
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           # (required)
