@@ -1,11 +1,17 @@
 use holochain::conductor::config::{
     AdminInterfaceConfig, ConductorConfig, InterfaceDriver, KeystoreConfig,
 };
+use holochain::conductor::paths::DataRootPath;
+use holochain_keystore::paths::KeystorePath;
+use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::config::{
+    KitsuneP2pConfig, TransportConfig,
+};
 use holochain_p2p::kitsune_p2p::{
     dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams,
-    dependencies::url2::Url2, KitsuneP2pConfig, TransportConfig,
+    dependencies::url2::Url2,
 };
 use holochain_types::db::DbSyncStrategy;
+use holochain_types::websocket::AllowedOrigins;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -29,16 +35,22 @@ pub fn conductor_config(
     network_config.tuning_params = Arc::new(tuning_params);
     // Build the conductor configuration
     ConductorConfig {
-        environment_path: databases_path.into(),
         dpki: None,
         db_sync_strategy: DbSyncStrategy::default(),
         keystore: KeystoreConfig::LairServerInProc {
-            lair_root: lair_path.to_owned(),
+            lair_root: lair_path
+                .as_ref()
+                .map(|path_buf| KeystorePath::from(path_buf.clone())),
         },
         admin_interfaces: Some(vec![AdminInterfaceConfig {
-            driver: InterfaceDriver::Websocket { port: admin_port },
+            driver: InterfaceDriver::Websocket {
+                port: admin_port,
+                allowed_origins: AllowedOrigins::Any,
+            },
         }]),
-        network: Some(network_config),
+        network: network_config,
         tracing_override: None,
+        data_root_path: Some(DataRootPath::from(databases_path)),
+        tuning_params: None,
     }
 }
