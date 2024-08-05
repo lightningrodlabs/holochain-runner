@@ -40,6 +40,11 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           cpanm Locale::Maketext::Simple
+          cpanm --installdeps .
+      - name: Verify Perl installation
+        if: matrix.os == 'windows-latest'
+        run: |
+          perl -MLocale::Maketext::Simple -e "print 'Perl module Locale::Maketext::Simple is installed\n'"
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           # (required)
