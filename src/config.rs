@@ -1,5 +1,5 @@
 use holochain::conductor::config::{
-    AdminInterfaceConfig, ConductorConfig, InterfaceDriver, KeystoreConfig,
+    AdminInterfaceConfig, ConductorConfig, DpkiConfig, InterfaceDriver, KeystoreConfig,
 };
 use holochain::conductor::paths::DataRootPath;
 use holochain_keystore::paths::KeystorePath;
@@ -28,6 +28,7 @@ pub fn conductor_config(
     network_config.bootstrap_service = Some(bootstrap_url.to_owned());
     network_config.transport_pool.push(TransportConfig::WebRTC {
         signal_url: webrtc_signal_url.to_owned(),
+        webrtc_config: None,
     });
     // Set gossip arc clamping
     let mut tuning_params = KitsuneP2pTuningParams::default();
@@ -35,7 +36,12 @@ pub fn conductor_config(
     network_config.tuning_params = Arc::new(tuning_params);
     // Build the conductor configuration
     ConductorConfig {
-        dpki: None,
+        dpki: DpkiConfig {
+            dna_path: None,
+            network_seed: "".to_string(),
+            allow_throwaway_random_dpki_agent_key: false,
+            no_dpki: true,
+        },
         db_sync_strategy: DbSyncStrategy::default(),
         keystore: KeystoreConfig::LairServerInProc {
             lair_root: lair_path
@@ -52,5 +58,8 @@ pub fn conductor_config(
         tracing_override: None,
         data_root_path: Some(DataRootPath::from(databases_path)),
         tuning_params: None,
+        chc_url: None,
+        device_seed_lair_tag: None,
+        danger_generate_throwaway_device_seed: false,
     }
 }
