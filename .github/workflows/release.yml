@@ -52,6 +52,7 @@ jobs:
           else
             tar -czvf holochain-runner-${{ matrix.target }}.tar.gz -C target/${{ matrix.target }}/release holochain-runner
           fi
+        shell: bash
       - name: Upload Release Asset
         uses: actions/upload-artifact@v3
         with:
