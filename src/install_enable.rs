@@ -25,10 +25,13 @@ pub async fn install_app(
     emit(event_channel, StateSignal::InstallingApp).await;
     let payload: InstallAppPayload = InstallAppPayload {
         source: AppBundleSource::Path(happ_path),
-        agent_key,
+        agent_key: Some(agent_key),
         installed_app_id: Some(app_id),
-        membrane_proofs: HashMap::new(),
+        membrane_proofs: Some(HashMap::new()),
         network_seed,
+        existing_cells: HashMap::new(),
+        ignore_genesis_failure: false,
+        allow_throwaway_random_agent_key: false,
     };
     conductor_handle
         .clone()
