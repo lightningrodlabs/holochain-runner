@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-12]
         include:
           - os: ubuntu-latest
             arch: x86_64
@@ -17,7 +17,7 @@ jobs:
           - os: windows-latest
             arch: x86_64
             target: x86_64-pc-windows-msvc
-          - os: macos-latest
+          - os: macos-12
             arch: x86_64
             target: x86_64-apple-darwin
           - os: macos-latest
@@ -43,7 +43,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-${{ matrix.target }}-
       - uses: dtolnay/rust-toolchain@1.79
+      - name: Check if cache was restored
+        id: cache-check
+        run: |
+          if [ -d "target/${{ matrix.target }}/release" ]; then
+            echo "cache-hit=true" >> $GITHUB_ENV
+            echo "::set-output name=cache-hit::true"
+          else
+            echo "cache-hit=false" >> $GITHUB_ENV
+            echo "::set-output name=cache-hit::false"
+          fi
+        shell: bash
       - name: Build binary
+        if: steps.cache-check.outputs.cache-hit == 'false'
         run: cargo build --release --target ${{ matrix.target }}
       - name: Compress binary
         run: |
