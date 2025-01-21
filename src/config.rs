@@ -58,7 +58,6 @@ pub fn conductor_config(
         tracing_override: None,
         data_root_path: Some(DataRootPath::from(databases_path)),
         tuning_params: None,
-        chc_url: None,
         device_seed_lair_tag: None,
         danger_generate_throwaway_device_seed: false,
     }

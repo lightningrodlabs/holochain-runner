@@ -27,9 +27,8 @@ pub async fn install_app(
         source: AppBundleSource::Path(happ_path),
         agent_key: Some(agent_key),
         installed_app_id: Some(app_id),
-        membrane_proofs: Some(HashMap::new()),
+        roles_settings: Some(HashMap::new()),
         network_seed,
-        existing_cells: HashMap::new(),
         ignore_genesis_failure: false,
         allow_throwaway_random_agent_key: false,
     };
