@@ -1,4 +1,4 @@
-use hdk::prelude::AgentPubKey;
+use holochain_types::prelude::AgentPubKey;
 use holochain::conductor::{api::error::ConductorApiResult, ConductorHandle};
 
 use crate::{emit::emit, StateSignal};

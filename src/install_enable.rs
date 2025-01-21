@@ -1,12 +1,10 @@
 use std::{collections::HashMap, path::PathBuf};
-
-use hdk::prelude::{AgentPubKey, NetworkSeed};
+use holochain_types::prelude::{AgentPubKey, NetworkSeed};
 use holochain::conductor::{
     api::error::{ConductorApiError, ConductorApiResult},
     error::ConductorError,
     CellError, ConductorHandle,
 };
-#[allow(deprecated)]
 use holochain_types::app::InstalledAppId;
 use holochain_types::prelude::{AppBundleSource, InstallAppPayload};
 use tokio::sync::mpsc;
