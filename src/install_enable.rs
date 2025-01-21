@@ -1,12 +1,12 @@
-use std::{collections::HashMap, path::PathBuf};
-use holochain_types::prelude::{AgentPubKey, NetworkSeed};
 use holochain::conductor::{
     api::error::{ConductorApiError, ConductorApiResult},
     error::ConductorError,
     CellError, ConductorHandle,
 };
 use holochain_types::app::InstalledAppId;
+use holochain_types::prelude::{AgentPubKey, NetworkSeed};
 use holochain_types::prelude::{AppBundleSource, InstallAppPayload};
+use std::{collections::HashMap, path::PathBuf};
 use tokio::sync::mpsc;
 
 use crate::emit::{emit, StateSignal};

@@ -115,7 +115,6 @@ async fn conductor_handle(
         .expect("Could not initialize Conductor from configuration")
 }
 
-#[allow(deprecated)]
 async fn install_or_passthrough(
     conductor: &ConductorHandle,
     app_id: InstalledAppId,

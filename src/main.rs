@@ -6,7 +6,6 @@ use holochain_trace::Output;
 use std::env;
 use std::path::PathBuf;
 use structopt::StructOpt;
-use dotenv;
 
 mod config;
 mod embedded_runner;
@@ -142,7 +141,7 @@ fn main() {
         Some(path) => {
             println!("Looking for passphrase from env file");
             let env_val = dotenv::from_path(path.as_path())
-                .expect(format!("Failed to parse env file from {path:?}").as_str());
+                .unwrap_or_else(|_| panic!("Failed to parse env file from {path:?}"));
             env_val.load();
             let p = env::var("LAIR_PASSWORD").expect("No env var LAIR_PASSWORD found in env file");
             println!("Found passphrase, continuing...");
