@@ -1,63 +1,49 @@
-use holochain::conductor::{
-    api::error::{ConductorApiError, ConductorApiResult},
-    error::ConductorError,
-    CellError, ConductorHandle,
-};
+use crate::emit::{emit, StateSignal};
+use holochain_client::{AdminWebsocket, EnableAppResponse};
 use holochain_types::app::InstalledAppId;
 use holochain_types::prelude::{AgentPubKey, NetworkSeed};
 use holochain_types::prelude::{AppBundleSource, InstallAppPayload};
 use std::{collections::HashMap, path::PathBuf};
 use tokio::sync::mpsc;
 
-use crate::emit::{emit, StateSignal};
-
 pub async fn install_app(
-    conductor_handle: &ConductorHandle,
+    admin_client: &AdminWebsocket,
     agent_key: AgentPubKey,
     app_id: InstalledAppId,
     happ_path: PathBuf,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     network_seed: Option<NetworkSeed>,
-) -> ConductorApiResult<()> {
-    println!("continuing with the installation...");
+) -> anyhow::Result<()> {
     emit(event_channel, StateSignal::InstallingApp).await;
-    let payload: InstallAppPayload = InstallAppPayload {
-        source: AppBundleSource::Path(happ_path),
-        agent_key: Some(agent_key),
-        installed_app_id: Some(app_id),
-        roles_settings: Some(HashMap::new()),
-        network_seed,
-        ignore_genesis_failure: false,
-        allow_throwaway_random_agent_key: false,
-    };
-    conductor_handle
-        .clone()
-        // .install_app(app_id, cell_ids_with_proofs.clone())
-        .install_app_bundle(payload)
-        .await?;
+    admin_client
+        .install_app(InstallAppPayload {
+            source: AppBundleSource::Path(happ_path),
+            agent_key: Some(agent_key),
+            installed_app_id: Some(app_id),
+            roles_settings: Some(HashMap::new()),
+            network_seed,
+            ignore_genesis_failure: false,
+            allow_throwaway_random_agent_key: false,
+        })
+        .await
+        .map_err(|e| anyhow::anyhow!("Failed to install app {:?}", e))?;
     Ok(())
 }
 
 pub async fn enable_app(
-    conductor_handle: &ConductorHandle,
+    admin_client: &AdminWebsocket,
     app_id: InstalledAppId,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
-) -> ConductorApiResult<()> {
-    // relates to: https://github.com/holochain/holochain/blob/55af424c2f2c2669d8253804f4e2b888abf245f2/crates/holochain/src/conductor/api/api_external/admin_interface.rs
-    // Enable app
+) -> anyhow::Result<()> {
     emit(event_channel, StateSignal::EnablingApp).await;
-    let (_app, mut errors) = conductor_handle.clone().enable_app(app_id.clone()).await?;
-    conductor_handle
-        .get_app_info(&app_id)
-        .await?
-        .ok_or(ConductorError::AppNotInstalled(app_id))?;
+    let EnableAppResponse { mut errors, app: _ } = admin_client
+        .enable_app(app_id.clone())
+        .await
+        .map_err(|e| anyhow::anyhow!("Failed to enable app {:?}", e))?;
     if !errors.is_empty() {
-        if let Some((_cell_id, cell_error)) = errors.pop() {
-            Err(cell_error.into())
-        } else {
-            Err(ConductorApiError::CellError(CellError::Todo))
-        }
-    } else {
-        Ok(())
+        let (_cell_id, cell_error) = errors.pop().unwrap();
+        return Err(anyhow::anyhow!(cell_error));
     }
+
+    Ok(())
 }

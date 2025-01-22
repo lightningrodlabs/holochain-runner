@@ -1,8 +1,8 @@
 use embedded_runner::{async_main, HcConfig};
 use emit::StateSignal;
 use holochain::conductor::manager::handle_shutdown;
-use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
 use holochain_trace::Output;
+use kitsune_p2p_types::dependencies::url2::Url2;
 use std::env;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -36,15 +36,7 @@ configuration is found at this path"
     #[structopt(long, default_value = "main-app")]
     app_id: String,
 
-    // the 0 default here will just let the
-    // system pick a port
-    #[structopt(
-        long,
-        default_value = "0",
-        help = "The 0 default value here really means that
-a random open port will be selected if you don't pass one.
-The selected value will be reported out in the logs."
-    )]
+    #[structopt(long, default_value = "9090")]
     app_ws_port: u16,
 
     #[structopt(long, default_value = "1234", help = "")]
@@ -61,7 +53,7 @@ value of `<datastore_path>/keystore`."
 
     #[structopt(
         long,
-        default_value = "wss://signal.holo.host:",
+        default_value = "wss://sbd.holo.host",
         help = "Websocket URL (wss) to a holochain tx5 WebRTC signal server"
     )]
     webrtc_signal_url: String,
@@ -79,7 +71,7 @@ value of `<datastore_path>/keystore`."
 
     #[structopt(
         long,
-        default_value = "none",
+        default_value = "full",
         possible_values(&["full", "empty", "none"]),
         help = "Fix the size of the gossip arc you are responsible for serving to either the full DHT (full), 
 or none of it (empty). Default behavior is to auto-adjust your gossip arc based on network conditions."
@@ -148,7 +140,7 @@ fn main() {
 
             p.as_bytes().to_vec().into()
         }
-        None => {
+        _ => {
             println!("Looking for passphrase piped to stdin");
             let p: sodoken::BufRead = read_passphrase_secure::read_piped_passphrase()
                 .expect("could not read piped passphrase");
@@ -201,7 +193,8 @@ fn state_signal_to_stdout(signal: &StateSignal) -> i16 {
         StateSignal::InstallingApp => 4,
         StateSignal::EnablingApp => 5,
         StateSignal::AddingAppInterface => 6,
+        StateSignal::AuthenticatingAppInterface => 7,
         // Done/Ready Event
-        StateSignal::IsReady => 7,
+        StateSignal::IsReady => 8,
     }
 }

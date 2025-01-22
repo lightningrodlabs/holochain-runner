@@ -2,12 +2,12 @@ use crate::{
     emit::{emit, StateSignal},
     generate_key::find_or_generate_key,
 };
-use either::*;
-use holochain::conductor::{api::error::ConductorApiResult, Conductor, ConductorHandle};
-use holochain_p2p::kitsune_p2p::dependencies::url2::Url2;
+use holochain::conductor::{Conductor, ConductorHandle};
+use holochain_client::{AdminWebsocket, IssueAppAuthenticationTokenPayload};
 use holochain_trace::Output;
 use holochain_types::prelude::{InstalledAppId, NetworkSeed};
 use holochain_types::websocket::AllowedOrigins;
+use kitsune_p2p_types::dependencies::url2::Url2;
 use std::path::PathBuf;
 use tokio::sync::mpsc;
 use tracing::*;
@@ -71,6 +71,7 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
         match install_or_passthrough(
             &conductor_copy,
             hc_config.app_id,
+            hc_config.admin_ws_port,
             hc_config.app_ws_port,
             hc_config.happ_path,
             &hc_config.event_channel,
@@ -118,59 +119,95 @@ async fn conductor_handle(
 async fn install_or_passthrough(
     conductor: &ConductorHandle,
     app_id: InstalledAppId,
+    admin_ws_port: u16,
     app_ws_port: u16,
     happ_path: PathBuf,
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     network_seed: Option<NetworkSeed>,
-) -> ConductorApiResult<()> {
-    let app_ids = conductor.list_apps(None).await?;
-    // defaults
-    let using_app_ws_port: u16;
+) -> anyhow::Result<()> {
+    let admin_client = AdminWebsocket::connect(format!("localhost:{}", admin_ws_port)).await?;
 
-    let agent_key = find_or_generate_key(conductor, event_channel).await?;
+    let app_infos = admin_client
+        .list_apps(None)
+        .await
+        .map_err(|e| anyhow::anyhow!("Failed to list apps {:?}", e))?;
+    let matching_index = app_infos
+        .iter()
+        .position(|info| info.installed_app_id == app_id);
 
-    if app_ids.is_empty() {
-        println!("There is no app installed, so starting fresh...");
-        super::install_enable::install_app(
-            conductor,
-            agent_key,
-            app_id.clone(),
-            happ_path,
-            event_channel,
-            network_seed,
-        )
-        .await?;
-        println!("Installed, now enabling...");
-        super::install_enable::enable_app(conductor, app_id.clone(), event_channel).await?;
-        // add a websocket interface on the first run
-        // it will boot again at the same interface on second run
-        emit(event_channel, StateSignal::AddingAppInterface).await;
-        using_app_ws_port = conductor
-            .clone()
-            .add_app_interface(Either::Left(app_ws_port), AllowedOrigins::Any, None)
-            .await?;
-        println!("Enabled.");
-    } else {
-        println!("An existing configuration and identity was found, using that.");
-        let app_ports = conductor.list_app_interfaces().await?;
-        if !app_ports.is_empty() {
-            using_app_ws_port = app_ports[0].port;
-        } else {
-            println!("No app port is attached, adding one.");
-            using_app_ws_port = conductor
-                .clone()
-                .add_app_interface(
-                    Either::Left(app_ws_port),
-                    AllowedOrigins::Any,
-                    Some(app_id.clone()),
-                )
-                .await?;
+    match matching_index {
+        Some(_) => {
+            println!("An existing app was found with this app_id. Skipping app install.");
         }
-    }
+        _ => {
+            // Install App
+            println!("There is no app installed, so starting fresh...");
+            super::install_enable::install_app(
+                &admin_client,
+                find_or_generate_key(conductor, event_channel).await?,
+                app_id.clone(),
+                happ_path,
+                event_channel,
+                network_seed,
+            )
+            .await?;
 
+            // Enable App
+            println!("Installed, now enabling...");
+            super::install_enable::enable_app(&admin_client, app_id.clone(), event_channel).await?;
+        }
+    };
+
+    let app_interface_infos = admin_client
+        .list_app_interfaces()
+        .await
+        .map_err(|e| anyhow::anyhow!("Failed to list app interfaces {:?}", e))?;
+    println!("app interface infos {:?}", app_interface_infos);
+    let matching_index = app_interface_infos.iter().position(|info| {
+        info.installed_app_id.clone() == Some(app_id.clone()) && info.port == app_ws_port
+    });
+
+    let app_ws_token: Option<Vec<u8>> = match matching_index {
+        Some(_) => {
+            println!("An existing app interface was found with this app_id and app_ws_port. Skipping creating app websocket.");
+            None
+        }
+        _ => {
+            // Create App Websocket Interface
+            emit(event_channel, StateSignal::AddingAppInterface).await;
+            println!("Enabled, now creating app websocket...");
+            admin_client
+                .attach_app_interface(app_ws_port, AllowedOrigins::Any, Some(app_id.clone()))
+                .await
+                .map_err(|e| anyhow::anyhow!("Failed to attach app interface {:?}", e))?;
+
+            // Issue authentication token for app websocket inferface
+            emit(event_channel, StateSignal::AuthenticatingAppInterface).await;
+            println!("Created, now issuing authentication token for app websocket...");
+            let app_auth = admin_client
+                .issue_app_auth_token(IssueAppAuthenticationTokenPayload {
+                    installed_app_id: app_id.clone(),
+                    expiry_seconds: u64::MAX,
+                    single_use: false,
+                })
+                .await
+                .map_err(|e| anyhow::anyhow!("Failed to attach app interface {:?}", e))?;
+            println!("Issued.");
+
+            Some(app_auth.token)
+        }
+    };
     emit(event_channel, StateSignal::IsReady).await;
-    println!("     APP_WS_PORT: {}", using_app_ws_port);
+
+    println!("APP_WS_PORT: {}", app_ws_port);
+    if let Some(token) = app_ws_token {
+        println!(
+            "APP_WS_TOKEN: !!! THIS WILL ONLY BE SHOWN ONCE !!!\n{:?}",
+            token
+        );
+    }
     println!("INSTALLED_APP_ID: {}", app_id);
     println!("HOLOCHAIN_RUNNER_IS_READY");
+
     Ok(())
 }

@@ -13,12 +13,13 @@ human-panic = "2.0.2"
 tracing = "0.1.26"
 sodoken = "0.0.11"
 tokio = { version = "1.38", features = ["full"] }
-either = "1.9.0"
-holochain_p2p = "0.4.0"
+kitsune_p2p_types = "0.4.0"
 holochain_types = "0.4.0"
 holochain_keystore = "0.4.0"
 holochain_trace = "0.4.0"
 holochain = "0.4.0"
+holochain_client = "0.6.0"
 # termination feature enables handling of SIGTERM events as well on unix
 ctrlc = { version = "3.4.1", features = ["termination"] }
 dotenvs = "0.1.0"
+anyhow = "1.0.95"
