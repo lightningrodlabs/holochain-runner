@@ -32,7 +32,7 @@ OPTIONS:
             value of `<datastore_path>/keystore`.
         --network-seed <network-seed>
         --webrtc-signal-url <webrtc-signal-url>
-            Websocket URL (wss) to a holochain tx5 WebRTC signal server [default: wss://signal.holo.host]
+            Websocket URL (wss) to a holochain tx5 WebRTC signal server [default: wss://sbd.holo.host]
         --gossip-arc-clamping <gossip-arc-clamping>
             Fix the size of the gossip arc you are responsible for serving to either the full DHT (full), or none of it (empty). Default behavior is to auto-adjust your gossip arc based on network conditions.
             [default: auto]  [possible values: full, empty, none]
@@ -103,4 +103,4 @@ This library is currently by default pointed at the `https://bootstrap.holo.host
 
 ## Signal Service
 
-This library is currently by default pointed at the `wss://signal.holo.host` WebRTC signal service, but can be overridden.
+This library is currently by default pointed at the `wss://sbd.holo.host` WebRTC signal service, but can be overridden.

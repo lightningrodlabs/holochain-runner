@@ -1,5 +1,5 @@
-use hdk::prelude::AgentPubKey;
 use holochain::conductor::{api::error::ConductorApiResult, ConductorHandle};
+use holochain_types::prelude::AgentPubKey;
 
 use crate::{emit::emit, StateSignal};
 use tokio::sync::mpsc;

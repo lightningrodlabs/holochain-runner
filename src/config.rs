@@ -3,15 +3,11 @@ use holochain::conductor::config::{
 };
 use holochain::conductor::paths::DataRootPath;
 use holochain_keystore::paths::KeystorePath;
-use holochain_p2p::kitsune_p2p::dependencies::kitsune_p2p_types::config::{
-    KitsuneP2pConfig, TransportConfig,
-};
-use holochain_p2p::kitsune_p2p::{
-    dependencies::kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams,
-    dependencies::url2::Url2,
-};
 use holochain_types::db::DbSyncStrategy;
 use holochain_types::websocket::AllowedOrigins;
+use kitsune_p2p_types::config::tuning_params_struct::KitsuneP2pTuningParams;
+use kitsune_p2p_types::config::{KitsuneP2pConfig, TransportConfig};
+use kitsune_p2p_types::dependencies::url2::Url2;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -58,7 +54,6 @@ pub fn conductor_config(
         tracing_override: None,
         data_root_path: Some(DataRootPath::from(databases_path)),
         tuning_params: None,
-        chc_url: None,
         device_seed_lair_tag: None,
         danger_generate_throwaway_device_seed: false,
     }

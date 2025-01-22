@@ -11,6 +11,7 @@ pub enum StateSignal {
     InstallingApp,
     EnablingApp,
     AddingAppInterface,
+    AuthenticatingAppInterface,
     // Done/Ready Event
     IsReady,
 }
