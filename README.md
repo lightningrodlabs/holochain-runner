@@ -18,24 +18,30 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-        --admin-ws-port <admin-ws-port>             [default: 1234]
-        --app-id <app-id>                           [default: main-app]
-        --app-ws-port <app-ws-port>
-            The 0 default value here really means that
-            a random open port will be selected if you don't pass one.
-            The selected value will be reported out in the logs. [default: 0]
-        --bootstrap-url <bootstrap-url>             [default: https://bootstrap.holo.host]
+        --admin-ws-port <admin-ws-port>                 [default: 1234]
+        --app-id <app-id>                               [default: main-app]
+        --app-ws-port <app-ws-port>                     [default: 9090]
+        --bootstrap-url <bootstrap-url>                 [default: https://bootstrap.holo.host]
+    -e, --env-path <env-path>                          Path to a local .env file containing a LAIR_PASSWORD variable
+        --gossip-arc-clamping <gossip-arc-clamping>
+            Fix the size of the gossip arc you are responsible for serving to either the full DHT (full),
+            or none of it (empty). Default behavior is to auto-adjust your gossip arc based on network conditions.
+            [default: full]  [possible values: full, empty, none]
         --keystore-path <keystore-path>
             This folder will store the private keys. It is encrypted on both Mac and Linux, but not Windows.
             Per the behaviour of holochain itself, if you
             do not pass a value here, it will use a default which is equal to the
             value of `<datastore_path>/keystore`.
+        --logging <logging>
+            Outputs structured json from logging:
+                - None: No logging at all (fastest)
+                - Log: Output logs to stdout with spans (human readable)
+                - Compact: Same as Log but with less information
+                - Json: Output logs as structured json (machine readable)
+                 [default: Log]
         --network-seed <network-seed>
         --webrtc-signal-url <webrtc-signal-url>
             Websocket URL (wss) to a holochain tx5 WebRTC signal server [default: wss://sbd.holo.host]
-        --gossip-arc-clamping <gossip-arc-clamping>
-            Fix the size of the gossip arc you are responsible for serving to either the full DHT (full), or none of it (empty). Default behavior is to auto-adjust your gossip arc based on network conditions.
-            [default: auto]  [possible values: full, empty, none]
 
 
 ARGS:
@@ -45,7 +51,6 @@ ARGS:
     <datastore-path>    configuration values for `app_id` and `app_ws_port`
                         will be overridden if an existing
                         configuration is found at this path [default: databases]
-
 ```
 
 ## How it will work
@@ -91,6 +96,7 @@ pub enum StateSignal {
     InstallingApp,
     EnablingApp,
     AddingAppInterface,
+    AuthenticatingAppInterface,
     // Done/Ready Event, called when websocket interfaces and
     // everything else is ready
     IsReady,
