@@ -6,7 +6,23 @@ on:
       - "*"
 
 jobs:
+  create-release:
+    permissions: write-all
+    environment: Relay Release
+    runs-on: ubuntu-latest
+    outputs:
+      releaseId: ${{ steps.step1.outputs.id }}
+    steps:
+      - id: step1
+        uses: ncipollo/release-action@v1
+        with:
+          name: "holochain-runner ${{ github.ref_name }}"
+          body: ""
+          prerelease: true
+          draft: true
+
   build:
+    needs: create-release
     strategy:
       matrix:
         include:
@@ -65,7 +81,8 @@ jobs:
           fi
         shell: bash
       - name: Upload Release Asset
-        uses: actions/upload-artifact@v3
+        uses: AButler/upload-release-assets@v3.0
         with:
-          name: holochain-runner-${{ matrix.target }}.tar.gz
-          path: holochain-runner-${{ matrix.target }}.tar.gz
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release-id: ${{ needs.create-release.outputs.releaseId }}
+          files: holochain-runner-${{ matrix.target }}.tar.gz
