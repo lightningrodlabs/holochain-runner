@@ -15,7 +15,7 @@ jobs:
       - id: step1
         uses: ncipollo/release-action@v1
         with:
-          name: "holochain-runner ${{ github.ref_name }}"
+          name: "${{ github.ref_name }}"
           body: ""
           prerelease: true
           draft: true
