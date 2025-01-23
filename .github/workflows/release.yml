@@ -8,7 +8,6 @@ on:
 jobs:
   create-release:
     permissions: write-all
-    environment: Relay Release
     runs-on: ubuntu-latest
     outputs:
       releaseId: ${{ steps.step1.outputs.id }}
