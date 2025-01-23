@@ -9,9 +9,8 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, macos-12]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             arch: x86_64
             target: x86_64-unknown-linux-gnu
           - os: windows-latest
