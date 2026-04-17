@@ -1,6 +1,6 @@
 [package]
 name = "holochain-runner"
-version = "0.10.1"
+version = "0.11.0"
 description = "a Holochain runtime binary with key management, good defaults, and Status Update events. Suitable for development and production environments"
 authors = ["Connor Turland <connor@sprillow.com>", "Wesley Finck <wesleyfinck@gmail.com>", "Karl Bonnici <karlbonnici100@gmail.com>"]
 license = "CAL-1.0"
@@ -11,14 +11,14 @@ edition = "2021"
 structopt = "0.3"
 human-panic = "2.0.2"
 tracing = "0.1.26"
-sodoken = "0.0.11"
+sodoken = "0.1"
 tokio = { version = "1.38", features = ["full"] }
-kitsune_p2p_types = "0.4.0"
-holochain_types = "0.4.0"
-holochain_keystore = "0.4.0"
-holochain_trace = "0.4.0"
-holochain = "0.4.0"
-holochain_client = "0.6.0"
+url2 = "0.0.6"
+holochain_types = "0.6.1-rc.7"
+holochain_keystore = "0.6.1-rc.6"
+holochain_trace = "=0.6.1-rc.0"
+holochain = "0.6.1-rc.7"
+holochain_client = "0.8.1-rc.7"
 # termination feature enables handling of SIGTERM events as well on unix
 ctrlc = { version = "3.4.1", features = ["termination"] }
 dotenvs = "0.1.0"

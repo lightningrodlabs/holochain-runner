@@ -1,13 +1,13 @@
 # holochain-runner
 
-<!-- > Underlying Holochain Version: [v0.4.0-rc](https://github.com/holochain/holochain/blob/develop/CHANGELOG.md#holochain-040-dev5) -->
+<!-- > Underlying Holochain Version: [v0.6.1-rc.7](https://github.com/holochain/holochain/blob/main-0.6/CHANGELOG.md) -->
 <!-- > -->
-<!-- > Expects an HAPP built with HDK [v0.4.0-rc](https://docs.rs/hdk/0.4.0-rc/hdk/index.html) and HDI [v0.5.0-rc](https://docs.rs/hdi/0.5.0-rc/hdi/index.html) -->
+<!-- > Expects an HAPP built with HDK and HDI compatible with Holochain 0.6 -->
 
 An alternative Holochain conductor binary useful for quick startup and including handling of key generation and hApp installation.
 
 ```bash
-holochain-runner 0.10.1
+holochain-runner 0.11.0
 wrapped Holochain Conductor with Status Update events, and a good SIGTERM kill switch
 
 USAGE:
@@ -21,12 +21,9 @@ OPTIONS:
         --admin-ws-port <admin-ws-port>                 [default: 1234]
         --app-id <app-id>                               [default: main-app]
         --app-ws-port <app-ws-port>                     [default: 9090]
-        --bootstrap-url <bootstrap-url>                 [default: https://bootstrap.holo.host]
+        --bootstrap-url <bootstrap-url>
+            URL of the kitsune2 bootstrap server [default: https://dev-test-bootstrap2.holochain.org]
     -e, --env-path <env-path>                          Path to a local .env file containing a LAIR_PASSWORD variable
-        --gossip-arc-clamping <gossip-arc-clamping>
-            Fix the size of the gossip arc you are responsible for serving to either the full DHT (full),
-            or none of it (empty). Default behavior is to auto-adjust your gossip arc based on network conditions.
-            [default: full]  [possible values: full, empty, none]
         --keystore-path <keystore-path>
             This folder will store the private keys. It is encrypted on both Mac and Linux, but not Windows.
             Per the behaviour of holochain itself, if you
@@ -40,8 +37,14 @@ OPTIONS:
                 - Json: Output logs as structured json (machine readable)
                  [default: Log]
         --network-seed <network-seed>
+        --relay-url <relay-url>
+            URL of the iroh relay server [default: https://use1-1.relay.n0.iroh-canary.iroh.link./]
+        --target-arc-factor <target-arc-factor>
+            The target arc factor to apply when receiving hints from kitsune2.
+            In normal operation, leave this as the default 1.
+            For leacher nodes that do not contribute to gossip, set to 0. [default: 1]
         --webrtc-signal-url <webrtc-signal-url>
-            Websocket URL (wss) to a holochain tx5 WebRTC signal server [default: wss://sbd.holo.host]
+            Websocket URL (wss) to a holochain kitsune2 signal server [default: wss://dev-test-bootstrap2.holochain.org]
 
 
 ARGS:
@@ -105,8 +108,12 @@ pub enum StateSignal {
 
 ## Bootstrap Networking Service
 
-This library is currently by default pointed at the `https://bootstrap.holo.host` node discovery service, but can be overridden.
+This library is currently by default pointed at the `https://dev-test-bootstrap2.holochain.org` kitsune2 bootstrap service, but can be overridden.
 
 ## Signal Service
 
-This library is currently by default pointed at the `wss://sbd.holo.host` WebRTC signal service, but can be overridden.
+This library is currently by default pointed at the `wss://dev-test-bootstrap2.holochain.org` kitsune2 signal service, but can be overridden.
+
+## Relay Service
+
+This library is currently by default pointed at the `https://use1-1.relay.n0.iroh-canary.iroh.link./` iroh relay service, but can be overridden.

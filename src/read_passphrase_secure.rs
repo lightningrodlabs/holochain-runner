@@ -1,14 +1,18 @@
 use std::io::Result;
+use std::sync::{Arc, Mutex};
 
-pub fn read_piped_passphrase() -> Result<sodoken::BufRead> {
+pub type SharedLockedArray = Arc<Mutex<sodoken::LockedArray>>;
+
+pub fn read_piped_passphrase() -> Result<SharedLockedArray> {
     use std::io::Read;
 
     let stdin = std::io::stdin();
     let mut stdin = stdin.lock();
-    let passphrase = <sodoken::BufWriteSized<512>>::new_mem_locked()?;
+    let mut passphrase = sodoken::SizedLockedArray::<512>::new()
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
     let mut next_char = 0;
     loop {
-        let mut lock = passphrase.write_lock();
+        let mut lock = passphrase.lock();
         let done = match stdin.read_exact(&mut lock[next_char..next_char + 1]) {
             Ok(_) => {
                 if lock[next_char] == 10 {
@@ -23,17 +27,24 @@ pub fn read_piped_passphrase() -> Result<sodoken::BufRead> {
         };
         if done {
             if next_char == 0 {
-                return Ok(sodoken::BufWrite::new_no_lock(0).to_read());
+                return Ok(Arc::new(Mutex::new(sodoken::LockedArray::from(
+                    Vec::<u8>::new(),
+                ))));
             }
             if lock[next_char - 1] == 13 {
                 next_char -= 1;
             }
-            let out = sodoken::BufWrite::new_mem_locked(next_char)?;
+            let mut out = sodoken::LockedArray::new(next_char)
+                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
             {
-                let mut out_lock = out.write_lock();
+                let mut out_lock = out.lock();
                 out_lock.copy_from_slice(&lock[..next_char]);
             }
-            return Ok(out.to_read());
+            return Ok(Arc::new(Mutex::new(out)));
         }
     }
+}
+
+pub fn passphrase_from_bytes(bytes: Vec<u8>) -> SharedLockedArray {
+    Arc::new(Mutex::new(sodoken::LockedArray::from(bytes)))
 }

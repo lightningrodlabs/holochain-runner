@@ -23,7 +23,6 @@ pub async fn install_app(
             roles_settings: Some(HashMap::new()),
             network_seed,
             ignore_genesis_failure: false,
-            allow_throwaway_random_agent_key: false,
         })
         .await
         .map_err(|e| anyhow::anyhow!("Failed to install app {:?}", e))?;
@@ -36,14 +35,10 @@ pub async fn enable_app(
     event_channel: &Option<mpsc::Sender<StateSignal>>,
 ) -> anyhow::Result<()> {
     emit(event_channel, StateSignal::EnablingApp).await;
-    let EnableAppResponse { mut errors, app: _ } = admin_client
+    let _enable_response: EnableAppResponse = admin_client
         .enable_app(app_id.clone())
         .await
         .map_err(|e| anyhow::anyhow!("Failed to enable app {:?}", e))?;
-    if !errors.is_empty() {
-        let (_cell_id, cell_error) = errors.pop().unwrap();
-        return Err(anyhow::anyhow!(cell_error));
-    }
 
     Ok(())
 }

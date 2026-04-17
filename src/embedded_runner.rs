@@ -7,10 +7,13 @@ use holochain_client::{AdminWebsocket, IssueAppAuthenticationTokenPayload};
 use holochain_trace::Output;
 use holochain_types::prelude::{InstalledAppId, NetworkSeed};
 use holochain_types::websocket::AllowedOrigins;
-use kitsune_p2p_types::dependencies::url2::Url2;
 use std::path::PathBuf;
+use std::sync::{Arc, Mutex};
 use tokio::sync::mpsc;
 use tracing::*;
+use url2::Url2;
+
+pub type SharedLockedArray = Arc<Mutex<sodoken::LockedArray>>;
 
 pub struct HcConfig {
     pub app_id: String,
@@ -22,20 +25,19 @@ pub struct HcConfig {
     pub webrtc_signal_url: String,
     pub event_channel: Option<mpsc::Sender<StateSignal>>,
     pub bootstrap_url: Url2,
+    pub relay_url: Url2,
     pub network_seed: Option<NetworkSeed>,
-    pub gossip_arc_clamping: String,
+    pub target_arc_factor: u32,
     pub logging: Output,
 }
 
-pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> ConductorHandle {
+pub async fn async_main(passphrase: SharedLockedArray, hc_config: HcConfig) -> ConductorHandle {
     // Sets up a human-readable panic message with a request for bug reports
     // See https://docs.rs/human-panic/1.0.3/human_panic/
     human_panic::setup_panic!();
     // take in command line arguments
     holochain_trace::init_fmt(hc_config.logging).expect("Failed to start contextual logging");
     debug!("holochain_trace initialized");
-    // Uncomment this to get regular networking info status updates in the logs
-    // kitsune_p2p_types::metrics::init_sys_info_poll();
     if !hc_config.datastore_path.as_path().exists() {
         emit(&hc_config.event_channel, StateSignal::IsFirstRun).await;
         if let Err(e) = std::fs::create_dir(&hc_config.datastore_path) {
@@ -53,7 +55,8 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
         &hc_config.keystore_path,
         &hc_config.webrtc_signal_url,
         &hc_config.bootstrap_url,
-        &hc_config.gossip_arc_clamping,
+        &hc_config.relay_url,
+        hc_config.target_arc_factor,
     )
     .await;
 
@@ -91,13 +94,14 @@ pub async fn async_main(passphrase: sodoken::BufRead, hc_config: HcConfig) -> Co
 }
 
 async fn conductor_handle(
-    passphrase: sodoken::BufRead,
+    passphrase: SharedLockedArray,
     admin_ws_port: u16,
     databases_path: PathBuf,
     keystore_path: &Option<PathBuf>,
     webrtc_signal_url: &str,
     bootstrap_url: &Url2,
-    gossip_arc_clamping: &str,
+    relay_url: &Url2,
+    target_arc_factor: u32,
 ) -> ConductorHandle {
     let config = super::config::conductor_config(
         admin_ws_port,
@@ -105,7 +109,8 @@ async fn conductor_handle(
         keystore_path,
         webrtc_signal_url,
         bootstrap_url,
-        gossip_arc_clamping,
+        relay_url,
+        target_arc_factor,
     );
     // Initialize the Conductor
     Conductor::builder()
@@ -125,7 +130,8 @@ async fn install_or_passthrough(
     event_channel: &Option<mpsc::Sender<StateSignal>>,
     network_seed: Option<NetworkSeed>,
 ) -> anyhow::Result<()> {
-    let admin_client = AdminWebsocket::connect(format!("localhost:{}", admin_ws_port)).await?;
+    let admin_client =
+        AdminWebsocket::connect(format!("localhost:{}", admin_ws_port), None).await?;
 
     let app_infos = admin_client
         .list_apps(None)
@@ -177,7 +183,7 @@ async fn install_or_passthrough(
             emit(event_channel, StateSignal::AddingAppInterface).await;
             println!("Enabled, now creating app websocket...");
             admin_client
-                .attach_app_interface(app_ws_port, AllowedOrigins::Any, Some(app_id.clone()))
+                .attach_app_interface(app_ws_port, None, AllowedOrigins::Any, Some(app_id.clone()))
                 .await
                 .map_err(|e| anyhow::anyhow!("Failed to attach app interface {:?}", e))?;
 

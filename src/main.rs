@@ -2,10 +2,11 @@ use embedded_runner::{async_main, HcConfig};
 use emit::StateSignal;
 use holochain::conductor::manager::handle_shutdown;
 use holochain_trace::Output;
-use kitsune_p2p_types::dependencies::url2::Url2;
+use read_passphrase_secure::{passphrase_from_bytes, SharedLockedArray};
 use std::env;
 use std::path::PathBuf;
 use structopt::StructOpt;
+use url2::Url2;
 
 mod config;
 mod embedded_runner;
@@ -53,30 +54,38 @@ value of `<datastore_path>/keystore`."
 
     #[structopt(
         long,
-        default_value = "wss://sbd.holo.host",
-        help = "Websocket URL (wss) to a holochain tx5 WebRTC signal server"
+        default_value = "wss://dev-test-bootstrap2.holochain.org",
+        help = "Websocket URL (wss) to a holochain kitsune2 signal server"
     )]
     webrtc_signal_url: String,
 
     #[structopt(
         long,
         parse(from_str = Url2::parse),
-        default_value = "https://bootstrap.holo.host",
-        help = ""
+        default_value = "https://dev-test-bootstrap2.holochain.org",
+        help = "URL of the kitsune2 bootstrap server"
     )]
     bootstrap_url: Url2,
+
+    #[structopt(
+        long,
+        parse(from_str = Url2::parse),
+        default_value = "https://use1-1.relay.n0.iroh-canary.iroh.link./",
+        help = "URL of the iroh relay server"
+    )]
+    relay_url: Url2,
 
     #[structopt(long, help = "")]
     network_seed: Option<String>,
 
     #[structopt(
         long,
-        default_value = "full",
-        possible_values(&["full", "empty", "none"]),
-        help = "Fix the size of the gossip arc you are responsible for serving to either the full DHT (full), 
-or none of it (empty). Default behavior is to auto-adjust your gossip arc based on network conditions."
+        default_value = "1",
+        help = "The target arc factor to apply when receiving hints from kitsune2.
+In normal operation, leave this as the default 1.
+For leacher nodes that do not contribute to gossip, set to 0."
     )]
-    gossip_arc_clamping: String,
+    target_arc_factor: u32,
 
     #[structopt(
         long,
@@ -129,7 +138,7 @@ fn main() {
 
     // Load .env file if provided
 
-    let passphrase: sodoken::BufRead = match opt.env_path {
+    let passphrase: SharedLockedArray = match opt.env_path {
         Some(path) => {
             println!("Looking for passphrase from env file");
             let env_val = dotenv::from_path(path.as_path())
@@ -138,11 +147,11 @@ fn main() {
             let p = env::var("LAIR_PASSWORD").expect("No env var LAIR_PASSWORD found in env file");
             println!("Found passphrase, continuing...");
 
-            p.as_bytes().to_vec().into()
+            passphrase_from_bytes(p.into_bytes())
         }
         _ => {
             println!("Looking for passphrase piped to stdin");
-            let p: sodoken::BufRead = read_passphrase_secure::read_piped_passphrase()
+            let p = read_passphrase_secure::read_piped_passphrase()
                 .expect("could not read piped passphrase");
             println!("Found passphrase, continuing...");
 
@@ -167,8 +176,9 @@ fn main() {
                     webrtc_signal_url: opt.webrtc_signal_url,
                     event_channel: Some(state_signal_sender),
                     bootstrap_url: opt.bootstrap_url,
+                    relay_url: opt.relay_url,
                     network_seed: opt.network_seed,
-                    gossip_arc_clamping: opt.gossip_arc_clamping,
+                    target_arc_factor: opt.target_arc_factor,
                     logging: opt.logging,
                 },
             )
